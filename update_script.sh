@@ -52,7 +52,7 @@ if [ $? != 0 ]; then
 fi
 
 if [ "$SIG_CHECK" == "1" ]; then
-	gpg --list-sigs | grep security@slackware.comm >/dev/null
+	gpg --list-sigs | grep security@slackware.com >/dev/null
 	if [ $? != 0 ]; then
 		echo "*** You don't have the public key of 'security@slackware.com'"
 		echo "*** Digital signatures can not be verified"
