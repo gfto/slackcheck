@@ -1,6 +1,11 @@
 #
-# $Id: ChangeLog,v 1.13 2003/09/05 16:07:21 gf Exp $
+# $Id: ChangeLog,v 1.14 2004/01/05 10:02:27 gf Exp $
 #
+
+ v3.00 - 05 January 2004
+   New option that allows upgrade of local machine only. Help was improved by
+   adding more examples and better description of available program options.
+   A workaround has been added for the aaa_elflibs package in -current.
 
  v2.80 - 05 September 2003
    A workaround has been added for the module-init-tools package in -current.
