@@ -1,7 +1,7 @@
 #!/bin/sh
 # SlackCheck
 #
-# $Id: slcheck.sh,v 1.16 2003/04/09 14:28:42 gf Exp $
+# $Id: slcheck.sh,v 1.17 2003/04/18 08:59:29 gf Exp $
 #
 # Copyright (c) 2002 Georgi Chorbadzhiyski, Sofia, Bulgaria
 # All rights reserved.
@@ -24,7 +24,7 @@
 #  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-echo "SlackCheck v2.40"
+echo "SlackCheck v2.50"
 echo
 
 cd $(dirname $0)
@@ -118,10 +118,8 @@ package_name() {
 generate_upgrade_scripts() {
 	mkdir ${DIR_UPD} 2>/dev/null
 	echo "===> Generating upgrade scripts..."
-	for i in $SLACK_HOSTS
+	for HOST in $SLACK_HOSTS
 	do
-		# Remove directory
-		HOST=$(echo $i | cut -d/ -f2)
 		# Check if package list exist
 		if [ -f ${DIR_PKG}/${HOST} ]
 		then
@@ -130,31 +128,29 @@ generate_upgrade_scripts() {
 			rm ${DIR_UPD}/${FILE_UNKPACKS}${HOST}  >/dev/null 2>&1
 			rm ${DIR_UPD}/${FILE_UPDATES}${HOST}   >/dev/null 2>&1
 			rm ${DIR_UPD}/${FILE_UPDATES}${HOST}.* >/dev/null 2>&1
-			# For each package
-			while read mypack; do
-				mypack=$(echo "$mypack" | tr -s ' ' | cut -d" " -f11)
-				# Check if package exist in the distro packages
-				grep $mypack ${DIR_PKG}/${FILE_NEWEST} >/dev/null 2>&1
-				if [ $? != 0 ]
-				then
-					pkgname=$(package_name $mypack)
-					newpkg=$(grep /${pkgname}-[0-9] ${DIR_PKG}/${FILE_NEWEST})
-					if [ $? = 0 ]
+			# For each package, hostpkg is only package name, NO directories!
+			cat ${DIR_PKG}/$HOST | \
+			while read hostpkg; do
+				# Get package from the distro packages
+				# This contains FULL directory + package name
+				distro_package=$(grep /`package_name $hostpkg`-[0-9] ${DIR_PKG}/${FILE_NEWEST} | head -1 2>/dev/null)
+				if [ "$distro_package" != "" ]
+				then # Host package exist in the distro packages
+					distropkg=$(basename $distro_package) # Strip directory
+					if [ "$distropkg" != "$hostpkg" ]
 					then
-						newpkg=$(echo $newpkg | cut -f1 -d" ")
-						pkgdir=$(dirname $newpkg)
-						pkgname=$(basename $newpkg)
-						tgz="${pkgname}.tgz"
-						tgzpath="${pkgdir}/${pkgname}.tgz"
 						echo "\
-UPDATE=\"\$UPDATE ${pkgdir}/${pkgname}.tgz\" # EXISTING: ${mypack} \
+UPDATE=\"\$UPDATE ${distro_package}.tgz\" # EXISTING: ${hostpkg} \
 " >> ${DIR_UPD}/${FILE_UPDATES}${HOST}.newpkgs
-					# Add to unknown packages
-					else
-						echo "$mypack" >> ${DIR_UPD}/${FILE_UNKPACKS}${HOST}
+#						echo "New: $hostpkg -> $distropkg"
+#					else
+#						echo "Same: $hostpkg -> $distropkg"
 					fi
+				else # Add to unknown packages
+#					echo "Unknown: $hostpkg"
+					echo "$hostpkg" >> ${DIR_UPD}/${FILE_UNKPACKS}${HOST}
 				fi
-			done < ${DIR_PKG}/$i
+			done
 			# Add intereter
 			if [ -f ${DIR_UPD}/${FILE_UPDATES}${HOST}.newpkgs ]
 			then
