@@ -1,9 +1,9 @@
 #
-# $Id: ChangeLog,v 1.17 2005/01/28 12:46:07 gf Exp $
+# $Id: ChangeLog,v 1.18 2005/01/28 12:58:42 gf Exp $
 #
 
  v3.30 - 29 January 2005
-   Do not try to upgrade aaa_elflibs package. As Pat's says, this package
+   Do not try to upgrade aaa_elflibs package. As Patrick says, this package
    should be installed initially and then never upgraded. For more info
    see Slackware-current ChangeLog from Mon Jan 24 20:41:03 PST 2005
 
