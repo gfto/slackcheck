@@ -1,6 +1,10 @@
 #
-# $Id: ChangeLog,v 1.4 2003/03/11 15:06:07 gf Exp $
+# $Id: ChangeLog,v 1.5 2003/03/16 13:06:47 gf Exp $
 #
+
+ v2.30 - 16 Mar 2003
+   Remove checks for program existanse if xxx_CHECK features are not used.
+   Replace hardcoded check for wget with correct check for $DL_PRG.
 
  v2.20 - 11 Mar 2003
    Added workaround for sed. Longer explanation - sed was split out of bin
