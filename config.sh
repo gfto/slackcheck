@@ -1,7 +1,7 @@
 #!/bin/sh
 # SlackCheck configuration file
 #
-# $Id: config.sh,v 1.2 2003/03/07 12:44:17 gf Exp $
+# $Id: config.sh,v 1.3 2003/03/07 14:02:14 gf Exp $
 #
 
 PATH="/bin:/usr/bin:/usr/local/bin"
@@ -13,7 +13,7 @@ DL_HOST="http://mirrors.unixsol.org/slackware/slackware-current/slackware"
 #DL_HOST="ftp://ftp.slackware.com/pub/slackware/slackware-current/slackware"
 
 MD5_CHECK="1"             # Check md5 sums of downloaded packages
-SIG_CHECK="0"             # Check digital signatures of downloaded packages
+SIG_CHECK="1"             # Check digital signatures of downloaded packages
 HOSTS_FILE="update_hosts" # In this file are listed hosts that will be upgraded
 REMOTE_DIR="Updates"      # Upgraded packages will be downloaded in this
                           # directory on the remote machine.
