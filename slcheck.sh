@@ -1,7 +1,7 @@
 #!/bin/sh
 # SlackCheck
 #
-# $Id: slcheck.sh,v 1.5 2003/03/07 14:02:47 gf Exp $
+# $Id: slcheck.sh,v 1.6 2003/03/07 14:46:28 gf Exp $
 #
 # Copyright (c) 2002 Georgi Chorbadzhiyski, Sofia, Bulgaria
 # All rights reserved.
@@ -38,25 +38,19 @@ then
 	exit
 fi
 
-VALID_OPTS="--sync --collect --gen --dist --upgrade"
-
 # Show usage information
 usage() {
 	echo "Usage: $(basename $0) [options]"
 	echo
 	echo " OPTIONS:"
-	echo "   --sync      Get newest list of packages"
-	echo "   --collect   Collect list of installed packages from hosts"
-	echo "   --gen       Generate upgrade scripts"
-	echo "   --dist      Copy upgrade scripts to hosts"
-	echo "   --upgrade   Upgrade hosts using generated scripts"
+	echo "   --host h1 h2 h3   Upgrade this host(s)"
+	echo "   --file filename   Get hosts list from this file"
 	echo
-	echo " MAIN CONFIGURATION (to change edit config.sh):"
-	echo "    Hosts that will be upgraded:"
-	echo "        $SLACK_HOSTS"
-	echo
-	echo "    Packages are downloaded from:"
-	echo "        $DL_HOST"
+	echo "   --sync            Download newest list of packages"
+	echo "   --collect         Collect list of installed packages from hosts"
+	echo "   --gen             Generate upgrade scripts"
+	echo "   --dist            Copy upgrade scripts to hosts"
+	echo "   --upgrade         Upgrade hosts using generated scripts"
 	echo
 	echo " QUICK USAGE:"
 	echo "   Run:  $(basename $0) --sync --collect --gen"
@@ -64,6 +58,9 @@ usage() {
 	echo "   Run:  $(basename $0) --dist (for manual upgrade after that)"
 	echo "    or"
 	echo "   Run:  $(basename $0) --upgrade (for automatic upgrade)"
+	echo
+	echo " TO UPDATE SINGLE HOST:"
+	echo "   Run:  $(basename $0) --host blah.example.org --sync --collect --gen --upgrade"
 	echo
 	exit 1
 }
@@ -225,39 +222,57 @@ distribute_up_scripts() {
 	done
 }
 
-# Check validity of command line arguments
-[ $# -lt 1 ] && usage
-for opt in $@; do
-	ok="0"
-	for valid in $VALID_OPTS; do
-		if [ "$valid" = "$opt" ]; then
-			ok="1"
-			break
-		fi
-	done
-	[ "$ok" = "0" ] && echo "Unknown parameter: $opt"
-	[ "$ok" = "0" ] && usage
-done
+if [ "$1" = "" ]; then
+	usage
+fi
 
 # Process command line arguments
 while [ "$1" != "" ]; do
 	param=$1
 	shift
 	case "$param" in
+		--host)
+			if [ "$1" != "" ]; then
+				SLACK_HOSTS=""
+			fi
+			while [ "$1" != "" ]; do
+				param=$1
+				case "$param" in
+					--*)
+						break
+					;;
+					*)
+						SLACK_HOSTS="$SLACK_HOSTS $param"
+					;;
+				esac
+				shift
+			done
+		;;
+		--file)
+			HOSTS_FILE="$1"
+			if [ "$HOSTS_FILE" = "" -o ! -f "$HOSTS_FILE" ]; then
+				echo "Error: --file parameter is missing or file not found."
+				echo
+				usage
+				exit 1
+			fi
+			SLACK_HOSTS=`grep -v ^# $HOSTS_FILE`
+			shift
+		;;
 		--sync)
-			(sync_master_list)
+			DO_SYNC="1"
 		;;
 		--collect)
-			(collect_package_lists)
+			DO_COLLECT="1"
 		;;
 		--gen)
-			(generate_upgrade_scripts)
+			DO_GEN="1"
 		;;
 		--dist)
-			(distribute_up_scripts)
+			DO_DIST="1"
 		;;
 		--upgrade)
-			(upgrade_machines)
+			DO_UPGRADE="1"
 		;;
 		*)
 			usage
@@ -265,3 +280,18 @@ while [ "$1" != "" ]; do
 	esac
 done
 
+if [ "$SLACK_HOSTS" = "" ]; then
+	echo "Error: No hosts. Check --host parameter, --file parameter ot 'upgrade_hosts' file."
+	echo
+	exit 1
+fi
+
+echo -n "==> Hosts: "
+echo $SLACK_HOSTS
+echo
+
+[ "$DO_SYNC"    = "1" ] && (sync_master_list)
+[ "$DO_COLLECT" = "1" ] && (collect_package_lists)
+[ "$DO_GEN"     = "1" ] && (generate_upgrade_scripts)
+[ "$DO_DIST"    = "1" ] && (generate_upgrade_scripts)
+[ "$DO_UPGRADE" = "1" ] && (upgrade_machines)
