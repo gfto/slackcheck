@@ -2,7 +2,7 @@
 # Put one host per line
 # Lines starting with # and empty lines are skipped
 #
-# $Id: update_hosts,v 1.1 2003/03/07 12:36:26 gf Exp $
+# $Id: update_hosts,v 1.2 2003/03/14 07:20:49 gf Exp $
 #
 
 router
@@ -15,4 +15,6 @@ pl300
 sounder
 game
 noname
-gw0
+#gw0
+#sato
+#peter
