@@ -1,7 +1,7 @@
 #!/bin/sh
 # SlackCheck
 #
-# $Id: slcheck.sh,v 1.3 2003/03/07 10:07:54 gf Exp $
+# $Id: slcheck.sh,v 1.4 2003/03/07 13:35:09 gf Exp $
 #
 # Copyright (c) 2002 Georgi Chorbadzhiyski, Sofia, Bulgaria
 # All rights reserved.
@@ -144,12 +144,8 @@ generate_upgrade_scripts() {
 						tgz="${pkgname}.tgz"
 						tgzpath="${pkgdir}/${pkgname}.tgz"
 						echo "\
-[ -f ${tgz} ] || ${DL_PRG} ${DL_PRG_OPTS} \${URL}/${tgzpath}" \
-							>> ${DIR_UPD}/${FILE_UPDATES}${host}.get
-
-						echo "\
-[ -f ${tgz} ] && upgradepkg ${pkgname} # EXISTING: ${mypack}" \
-							>> ${DIR_UPD}/${FILE_UPDATES}${host}.up
+UPDATE=\"\$UPDATE ${pkgdir}/${pkgname}.tgz\" # EXISTING: ${mypack} \
+" >> ${DIR_UPD}/${FILE_UPDATES}${host}.newpkgs
 					# Add to unknown packages
 					else
 						echo "$mypack" >> ${DIR_UPD}/${FILE_UNKPACKS}${host}
@@ -157,32 +153,42 @@ generate_upgrade_scripts() {
 				fi
 			done < ${DIR_PKG}/$i
 			# Add intereter
-			if [ -f ${DIR_UPD}/${FILE_UPDATES}${host}.get ]
+			if [ -f ${DIR_UPD}/${FILE_UPDATES}${host}.newpkgs ]
 			then
+				sort ${DIR_UPD}/${FILE_UPDATES}${host}.newpkgs > .newpkgs.tmp
+				cat .newpkgs.tmp > ${DIR_UPD}/${FILE_UPDATES}${host}.newpkgs
+				rm .newpkgs.tmp
 				(echo '#!/bin/sh'
 				 echo
-				 echo "which ${DL_PRG} >/dev/null 2>&1"
-				 echo "if [ \$? != 0 ]; then"
-				 echo "	echo \"Can't find \\\"${DL_PRG}\\\" in \$PATH. Exiting.\""
-				 echo "	exit 1"
-				 echo "fi"
+				 echo "DL_HOST=\"${DL_HOST}\""
+				 echo "DL_PRG=\"${DL_PRG}\""
+				 echo "DL_PRG_OPTS=\"${DL_PRG_OPTS}\""
 				 echo
-				 echo "URL=\"${DL_HOST}\""
+				 echo "MD5_CHECK=\"${MD5_CHECK}\""
+				 echo "SIG_CHECK=\"${SIG_HOST}\""
 				 echo
-				 echo "rm -rf ${REMOTE_DIR} 2>/dev/null"
-				 echo "mkdir ${REMOTE_DIR} && cd ${REMOTE_DIR}"
+				 echo "REMOTE_DIR=\"${REMOTE_DIR}\""
+				 echo "REMOTE_DIR_DEL=\"${REMOTE_DIR_DEL}\""
 				 echo
-				 cat ${DIR_UPD}/${FILE_UPDATES}${host}.get
+				 echo "GENERATED=\"1\""
 				 echo
-				 cat ${DIR_UPD}/${FILE_UPDATES}${host}.up
+				 echo "# If you don't want package to be updated just delete the line."
 				 echo
-				 echo "cd .."
-				 echo "rm -rf ${REMOTE_DIR} 2>/dev/null"
+				 # Put glibc and elflibs updates first, otherwise
+				 # something may broke
+				 cat ${DIR_UPD}/${FILE_UPDATES}${host}.newpkgs | grep a/glibc
+				 cat ${DIR_UPD}/${FILE_UPDATES}${host}.newpkgs | grep a/elflibs
+				 cat ${DIR_UPD}/${FILE_UPDATES}${host}.newpkgs | grep a/pkgtools
+				 cat ${DIR_UPD}/${FILE_UPDATES}${host}.newpkgs | \
+					grep -v a/glibc | \
+					grep -v a/elflibs | \
+					grep -v a/pkgtools
 				 echo
+				 grep -v ^# update_script.sh
 				) > ${DIR_UPD}/${FILE_UPDATES}${host}
 			fi
 			# Cleanup
-			rm ${DIR_UPD}/${FILE_UPDATES}${host}.* >/dev/null 2>&1
+			rm ${DIR_UPD}/${FILE_UPDATES}${host}.newpkgs >/dev/null 2>&1
 			echo "Done."
 		fi
 	done
