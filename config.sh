@@ -1,7 +1,7 @@
 #!/bin/sh
 # SlackCheck configuration file
 #
-# $Id: config.sh,v 1.5 2003/04/08 12:05:06 gf Exp $
+# $Id: config.sh,v 1.6 2003/04/09 14:17:36 gf Exp $
 #
 
 PATH="/bin:/usr/bin:/usr/local/bin"
@@ -10,10 +10,11 @@ PATH="/bin:/usr/bin:/usr/local/bin"
 SLACK_VER="current"
 
 # Where to look for upgrades
-DL_HOST="http://mirrors.unixsol.org/slackware/slackware-${SLACK_VER}/slackware"
-#DL_HOST="http://www.slackware.at/data/slackware-${SLACK_VER}/slackware"
-#DL_HOST="http://ftp.planetmirror.com/pub/slackware/slackware-${SLACK_VER}/slackware"
-#DL_HOST="ftp://ftp.slackware.com/pub/slackware/slackware-${SLACK_VER}/slackware"
+DL_HOST="http://mirrors.unixsol.org/slackware/slackware-${SLACK_VER}"
+#DL_HOST="http://www.slackware.no/slackware/slackware-${SLACK_VER}"
+#DL_HOST="http://www.slackware.at/data/slackware-${SLACK_VER}"
+#DL_HOST="ftp://ftp.slackware.com/pub/slackware/slackware-${SLACK_VER}"
+#DL_HOST="http://ftp.planetmirror.com/pub/slackware/slackware-${SLACK_VER}"
 
 # Set variable to "0" if you dont want some of the functionality
 
