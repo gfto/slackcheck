@@ -64,22 +64,6 @@ if [ "$SIG_CHECK" == "1" ]; then
 	fi
 fi
 
-function sig_check() {
-	fname=$1
-	if [ "$SIG_CHECK" == "1" ]; then
-		echo "Checking digital signature of $fname:"
-		gpg --verify ${fname}.asc
-	fi
-}
-
-function md5_check() {
-	if [ "$MD5_CHECK" == "1" ]; then
-		grep $pkgfile CHECKSUMS.md5 | sed -e 's|\./.*/||' > ${pkgfile}.md5
-		echo "Checking MD5 sums:"
-		md5sum -c ${pkgfile}.md5
-	fi
-}
-
 mkdir ${REMOTE_DIR} 2>/dev/null
 
 (
@@ -91,27 +75,40 @@ mkdir ${REMOTE_DIR} 2>/dev/null
 	fi
 
 	echo "===> Downloading packages..."
-	for PKG in $UPDATE
-	do
+	for PKG in $UPDATE; do
 		pkgfile=`basename $PKG`
 		if [ ! -f $pkgfile ]; then
 			$DL_PRG $DL_PRG_OPTS ${DL_HOST}/$PKG
 			$DL_PRG $DL_PRG_OPTS ${DL_HOST}/$PKG.asc
+			# Generate file file MD5 sums for this package
+			grep $pkgfile CHECKSUMS.md5 | sed -e 's|\./.*/||' > ${pkgfile}.md5
 		fi
-		md5_check ${pkgfile}
-		sig_check ${pkgfile}
 	done
 
+	if [ "$MD5_CHECK" == "1" ]; then
+		echo "===> Checking MD5 sums..."
+		for PKG in $UPDATE; do
+			md5sum -c ${pkgfile}.md5
+		done
+	fi
+
+	if [ "$SIG_CHECK" == "1" ]; then
+		echo "===> Checking digital signatures..."
+		for PKG in $UPDATE; do
+			echo "Checking digital signature of $fname:"
+			gpg --verify ${fname}.asc
+		done
+	fi
+
 	echo "===> Upgrating packages..."
-	for PKG in $UPDATE
-	do
+	for PKG in $UPDATE; do
 		pkgfile=`basename $PKG`
 		if [ ! -f $pkgfile ]; then
 			upgradepkg ${pkgfile}
 		fi
 	done
 	if [ "$REMOTE_DIR_DEL" = "1" ]; then
-		echo "===> Delete '${REMOTE_DIR}' directory."
+		echo "===> Deleting '${REMOTE_DIR}' directory..."
 		cd ..
 		rm -rfv ${REMOTE_DIR}
 	fi
