@@ -1,7 +1,7 @@
 #!/bin/sh
 # Upgrade script template
 #
-# Copyright (c) 2002 Georgi Chorbadzhiyski, Sofia, Bulgaria
+# Copyright (c) 2002-2004 Georgi Chorbadzhiyski, Sofia, Bulgaria
 # All rights reserved.
 #
 # Redistribution and use of this script, with or without modification, is
@@ -147,6 +147,16 @@ mkdir ${REMOTE_DIR} 2>/dev/null
 			pkg_install "Bin upgraded! sed needs to be installed." $PKG_SED
 		fi
 	done
+
+	# Workaround for aaa_elflibs, for more info see
+	# slackware-current ChangeLog (Mon Dec 15 17:49:23 PST 2003)
+	if [ "$PKG_AAAELFLIBS" != "" ]; then
+		if [ "`ls /var/adm/packages/aaa_elflibs-* 2>/dev/null`" = "" -a \
+		     "`ls /var/adm/packages/elflibs-* 2>/dev/null`" != "" ]
+		then
+			pkg_upgrade "Replacing elflibs packaet with aaa_elflibs." $PKG_AAAELFLIBS elflibs
+		fi
+	fi
 
 	# Workaround for coreutils, for more info see
 	# slackware-current ChangeLog (Wed May 21 16:05:37 PDT 2003)
