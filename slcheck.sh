@@ -1,7 +1,7 @@
 #!/bin/sh
 # SlackCheck
 #
-# $Id: slcheck.sh,v 1.28 2005/01/28 12:47:46 gf Exp $
+# $Id: slcheck.sh,v 1.29 2005/01/31 15:44:16 gf Exp $
 #
 # Copyright (c) 2002-2004 Georgi Chorbadzhiyski, Sofia, Bulgaria
 # All rights reserved.
@@ -24,7 +24,7 @@
 #  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-echo "SlackCheck v3.30"
+echo "SlackCheck v3.40"
 echo
 
 cd $(dirname $0)
@@ -142,7 +142,7 @@ generate_upgrade_scripts() {
 			rm ${DIR_UPD}/${FILE_UPDATES}${HOST}   >/dev/null 2>&1
 			rm ${DIR_UPD}/${FILE_UPDATES}${HOST}.* >/dev/null 2>&1
 			# For each package, hostpkg is only package name, NO directories!
-			cat ${DIR_PKG}/$HOST | \
+			cat ${DIR_PKG}/$HOST | grep -v aaa_elflibs | \
 			while read hostpkg; do
 				# Get package from the distro packages
 				# This contains FULL directory + package name
@@ -196,8 +196,7 @@ UPDATE=\"\$UPDATE ${distro_package}.tgz\" # EXISTING: ${hostpkg} \
 				 cat ${DIR_UPD}/${FILE_UPDATES}${HOST}.newpkgs | \
 					grep -v a/glibc | \
 					grep -v a/elflibs | \
-					grep -v a/pkgtools | \
-					grep -v a/aaa_elflibs
+					grep -v a/pkgtools
 				 # workarounds
 				 echo "PKG_SED=\"`grep sed- ${DIR_PKG}/${FILE_NEWEST} 2>/dev/null`\"";
 				 echo "PKG_COREUTILS=\"`grep coreutils- ${DIR_PKG}/${FILE_NEWEST} 2>/dev/null`\"";
