@@ -1,19 +1,27 @@
 #!/bin/sh
 # SlackCheck configuration file
 #
-# $Id: config.sh,v 1.1 2003/01/05 08:26:12 gf Exp $
+# $Id: config.sh,v 1.2 2003/03/07 12:44:17 gf Exp $
 #
 
 PATH="/bin:/usr/bin:/usr/local/bin"
 
-# Hosts that will be updated
-SLACK_HOSTS="router ns work man host gf pl300 sounder game noname"
-
-# Where to look for updates
-DL_HOST="http://mirrors.unixsol.org/slackware/current/slackware"
+# Where to look for upgrades
+DL_HOST="http://mirrors.unixsol.org/slackware/slackware-current/slackware"
 #DL_HOST="http://www.slackware.at/data/slackware-current/slackware"
 #DL_HOST="http://ftp.planetmirror.com/pub/slackware/slackware-current/slackware"
 #DL_HOST="ftp://ftp.slackware.com/pub/slackware/slackware-current/slackware"
+
+MD5_CHECK="1"             # Check md5 sums of downloaded packages
+SIG_CHECK="0"             # Check digital signatures of downloaded packages
+HOSTS_FILE="update_hosts" # In this file are listed hosts that will be upgraded
+REMOTE_DIR="Updates"      # Upgraded packages will be downloaded in this
+                          # directory on the remote machine.
+                          # Make sure it has enough disk space!
+                          # After generating upgrade scripts you can change
+                          # this variable per host
+REMOTE_DIR_DEL="1"        # Delete directory with downloaded packages after
+                          # finishing updates
 
 # This program will be used to download files from web
 DL_PRG="wget"
@@ -21,8 +29,7 @@ DL_PRG_OPTS="-nv"
 
 # Used for ftp downloads
 echo $DL_HOST | grep ^ftp://
-if [ $? = 0 ]
-then
+if [ $? = 0 ]; then
 	DL_PRG="wget"
 	DL_PRG_OPTS="-nv --passive"
 fi
@@ -32,14 +39,16 @@ RSH_LISTS="ssh"
 RSH_UPGRADE="ssh -l root"
 
 # NO NEED TO TOUCH ANYTHING BELLOW THIS LINE :)
+
+SLACK_HOSTS=`grep -v ^# $HOSTS_FILE`
+[ $? = 0 ] || exit
+
 DIR_PKG="packages"        # Package lists directory
 DIR_UPD="updates"         # Update scripts directory
 
 FILE_NEWEST="PKG_LAST"    # Latest packages filename
 FILE_UNKPACKS="Non_dist-" # Non distro packages per host
 FILE_UPDATES="Updates-"   # Update script per host
-
-REMOTE_DIR="Updates"      # Upgrated packages will be DLed here (on the remote machine)
 
 if [ "$INC_CONFIG" != "0" ]
 then
