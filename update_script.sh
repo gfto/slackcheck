@@ -61,8 +61,8 @@ if [ "$SIG_CHECK" == "1" ]; then
 		echo "*** You don't have the public key of 'security@slackware.com'"
 		echo "*** Digital signatures can not be verified"
 		echo "*** Download slackware's public key from here:"
-		echo "*** ftp://ftp.slackware.com/pub/slackware/slackware-current/GPG-KEY"
-		echo "*** After obtaining the key, execute 'gpg --import GPG-KEY'"
+		echo "*** http://www.slackware.com/gpg-key"
+		echo "*** After obtaining the key, execute 'gpg --import gpg-key'"
 		echo
 		SIG_CHECK="0"
 	fi
