@@ -1,6 +1,14 @@
 #
-# $Id: ChangeLog,v 1.1 2003/01/05 08:26:12 gf Exp $
+# $Id: ChangeLog,v 1.2 2003/03/07 15:21:42 gf Exp $
 #
+
+ v2.00 - 07 Mar 2003
+   This version works correctly with Slackware 9.0rc1 and above
+   Upgrade script is now template. This allows easier customizations
+   MD5 sums and digital signatures of the packages are checked before upgrading
+   Important packages (glibc, elflibs) are upgraded first
+   In case of error (checksum, no free space, etc) upgrade is stopped immediately
+   List of hosts can be set using --host or --file switches
 
  v1.00 - 05 Jan 2003
    Download package list from slackware mirror
