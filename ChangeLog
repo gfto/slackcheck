@@ -1,6 +1,12 @@
 #
-# $Id: ChangeLog,v 1.15 2004/01/06 17:33:09 gf Exp $
+# $Id: ChangeLog,v 1.16 2004/06/02 19:54:51 gf Exp $
 #
+
+ v3.20 - 02 June 2004
+   A bug was fixed that was preventing correct checksum validation when two
+   packages have the same names but are in different directories.
+   A bug was fixed that prevented updating system that has no modutils
+   installed.
 
  v3.10 - 06 January 2004
    Fix stupid bug that prevents --local from working when slcheck is run from
