@@ -1,5 +1,5 @@
 #
-# $Id: ChangeLog,v 1.5 2003/03/16 13:06:47 gf Exp $
+# $Id: ChangeLog,v 1.6 2003/03/16 13:07:38 gf Exp $
 #
 
  v2.30 - 16 Mar 2003
@@ -7,7 +7,7 @@
    Replace hardcoded check for wget with correct check for $DL_PRG.
 
  v2.20 - 11 Mar 2003
-   Added workaround for sed. Longer explanation - sed was split out of bin
+   Added workaround for sed. Longer explanation: sed was split out of bin
    package so upgrading bin package caused pkgtools to stop working. The
    workaround prevents this by checking if sed is useful after each upgradepkg.
 
