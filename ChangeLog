@@ -1,9 +1,9 @@
 #
-# $Id: ChangeLog,v 1.9 2003/04/18 09:21:27 gf Exp $
+# $Id: ChangeLog,v 1.10 2003/04/18 09:29:57 gf Exp $
 #
 
  v2.50 - 18 Apr 2003
-   Rewrite detection of updated packages. The logic now is less error prone.
+   Rewritten detection of updated packages. The logic now is less error prone.
 
  v2.40 - 09 Apr 2003
    Use CHECKSUMS.md5 from / directory. This allows patches/ directory to be
