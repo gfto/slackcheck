@@ -86,6 +86,7 @@ mkdir ${REMOTE_DIR} 2>/dev/null
 		$DL_PRG $DL_PRG_OPTS ${DL_HOST}/CHECKSUMS.md5
 	fi
 
+	echo "*** Downloading packages *** "
 	for PKG in $UPDATE
 	do
 		pkgfile=`basename $PKG`
@@ -95,7 +96,15 @@ mkdir ${REMOTE_DIR} 2>/dev/null
 		fi
 		md5_check ${pkgfile}
 		sig_check ${pkgfile}
-		upgradepkg ${pkgfile}
+	done
+
+	echo "*** Upgrating packages *** "
+	for PKG in $UPDATE
+	do
+		pkgfile=`basename $PKG`
+		if [ ! -f $pkgfile ]; then
+			upgradepkg ${pkgfile}
+		fi
 	done
 	if [ "$REMOTE_DIR_DEL" = "1" ]; then
 		echo "INFO: Cleanup"
