@@ -1,7 +1,7 @@
 #!/bin/sh
 # SlackCheck configuration file
 #
-# $Id: config.sh,v 1.8 2004/01/05 09:04:57 gf Exp $
+# $Id: config.sh,v 1.9 2005/01/28 12:47:05 gf Exp $
 #
 
 PATH="/bin:/usr/bin:/usr/local/bin"
@@ -18,6 +18,12 @@ DL_HOST="http://mirrors.unixsol.org/slackware/slackware-${SLACK_VER}"
 #DL_HOST="http://www.slackware.at/data/slackware-${SLACK_VER}"
 #DL_HOST="ftp://ftp.slackware.com/pub/slackware/slackware-${SLACK_VER}"
 #DL_HOST="http://ftp.planetmirror.com/pub/slackware/slackware-${SLACK_VER}"
+
+# Slackware is somewhere on the local disk
+# If you want to upgrade packages from Slackware CD, mount Slack CD-ROM
+# to /mnt/cdrom (mount /dev/cdrom /mnt/cdrom) and uncomment the line bellow
+#DL_HOST="/mnt/cdrom"
+#DL_HOST="/home/gf/mnt/slack/mirror/slackware-current"
 
 # Set variable to "0" if you dont want some of the functionality
 
@@ -38,17 +44,20 @@ SMART_UPGRADE="1"         # When lilo-* or kernel-* packages are updated run
 
 # This program will be used to download files from web
 DL_PRG="wget"
-
-# Non-verbose mode of the new wget is fucked up. It shows what is downloaded
-# after finishing the download and I think thats very irritating
-#DL_PRG_OPTS="-nv"
+DL_PRG_OPTS="--progress=bar:force"
 
 # Used for ftp downloads
 echo $DL_HOST | grep ^ftp://
 if [ $? = 0 ]; then
 	DL_PRG="wget"
-	DL_PRG_OPTS="--passive"
-#	DL_PRG_OPTS="-nv --passive"
+	DL_PRG_OPTS="--passive --progress=bar:force"
+fi
+
+# If files are on the local disk
+echo $DL_HOST | grep ^/
+if [ $? = 0 ]; then
+	DL_PRG="ln"
+	DL_PRG_OPTS="-sfv"
 fi
 
 # These programs will be used in collection and updating hosts
