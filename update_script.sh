@@ -32,30 +32,34 @@ fi
 
 which wget >/dev/null 2>&1
 if [ $? != 0 ]; then
-	echo "Can't find \"wget\" in $PATH. Exiting."
+	echo "*** Can't find \"wget\" in $PATH. Exiting."
+	echo
 	exit 1
 fi
 
 which md5sum >/dev/null 2>&1
 if [ $? != 0 ]; then
-	echo "WARN: Can't find \"md5sum\" MD5 sums will not be checked"
+	echo "*** Can't find \"md5sum\" MD5 sums will not be checked"
+	echo
 	MD5_CHECK="0"
 fi
 
 which gpg >/dev/null 2>&1
 if [ $? != 0 ]; then
-	echo "WARN: Can't find \"gpg\" digital signatures will not be checked"
+	echo "*** Can't find \"gpg\" digital signatures will not be checked"
+	echo
 	SIG_CHECK="0"
 fi
 
 if [ "$SIG_CHECK" == "1" ]; then
 	gpg --list-sigs | grep security@slackware.comm >/dev/null
 	if [ $? != 0 ]; then
-		echo "WARN: You don't have the public key of 'security@slackware.com'"
-		echo "WARN: Digital signatures can not be verified"
-		echo "WARN: Download slackware's public key from here:"
-		echo "WARN: ftp://ftp.slackware.com/pub/slackware/slackware-current/GPG-KEY"
-		echo "WARN: After obtaining the key, execute 'gpg --import GPG-KEY'"
+		echo "*** You don't have the public key of 'security@slackware.com'"
+		echo "*** Digital signatures can not be verified"
+		echo "*** Download slackware's public key from here:"
+		echo "*** ftp://ftp.slackware.com/pub/slackware/slackware-current/GPG-KEY"
+		echo "*** After obtaining the key, execute 'gpg --import GPG-KEY'"
+		echo
 		SIG_CHECK="0"
 	fi
 fi
@@ -63,7 +67,7 @@ fi
 function sig_check() {
 	fname=$1
 	if [ "$SIG_CHECK" == "1" ]; then
-		echo "INFO: Checking digital signature of $fname"
+		echo "Checking digital signature of $fname:"
 		gpg --verify ${fname}.asc
 	fi
 }
@@ -71,7 +75,7 @@ function sig_check() {
 function md5_check() {
 	if [ "$MD5_CHECK" == "1" ]; then
 		grep $pkgfile CHECKSUMS.md5 | sed -e 's|\./.*/||' > ${pkgfile}.md5
-		echo "INFO: Checking MD5 sums"
+		echo "Checking MD5 sums:"
 		md5sum -c ${pkgfile}.md5
 	fi
 }
@@ -86,7 +90,7 @@ mkdir ${REMOTE_DIR} 2>/dev/null
 		$DL_PRG $DL_PRG_OPTS ${DL_HOST}/CHECKSUMS.md5
 	fi
 
-	echo "*** Downloading packages *** "
+	echo "===> Downloading packages..."
 	for PKG in $UPDATE
 	do
 		pkgfile=`basename $PKG`
@@ -98,7 +102,7 @@ mkdir ${REMOTE_DIR} 2>/dev/null
 		sig_check ${pkgfile}
 	done
 
-	echo "*** Upgrating packages *** "
+	echo "===> Upgrating packages..."
 	for PKG in $UPDATE
 	do
 		pkgfile=`basename $PKG`
@@ -107,7 +111,7 @@ mkdir ${REMOTE_DIR} 2>/dev/null
 		fi
 	done
 	if [ "$REMOTE_DIR_DEL" = "1" ]; then
-		echo "INFO: Cleanup"
+		echo "===> Delete '${REMOTE_DIR}' directory."
 		cd ..
 		rm -rfv ${REMOTE_DIR}
 	fi
