@@ -63,7 +63,7 @@ if [ "$SIG_CHECK" == "1" ]; then
 	if [ $? != 0 ]; then
 		echo "*** You don't have the public key of 'security@slackware.com'"
 		echo "*** Digital signatures can not be verified"
-		echo "*** Download slackware's public key from here:"
+		echo "*** Get slackware's public key from here:"
 		echo "*** http://www.slackware.com/gpg-key"
 		echo "*** After obtaining the key, execute 'gpg --import gpg-key'"
 		echo
@@ -91,7 +91,7 @@ pkg_upgrade() {
 mkdir ${REMOTE_DIR} 2>/dev/null
 
 (
-	# Download, verify and update packages
+	# Get, verify and update packages
 	set -e # Halt on any error
 	cd ${REMOTE_DIR}
 	if [ "$MD5_CHECK" == "1" ]; then
@@ -100,14 +100,14 @@ mkdir ${REMOTE_DIR} 2>/dev/null
 		fi
 	fi
 
-	echo "===> Downloading packages..."
+	echo "===> Getting packages..."
 	for PKG in $UPDATE; do
 		pkgfile=`basename $PKG`
 		if [ ! -f $pkgfile ]; then
-			echo "   - Downloading $PKG"
+			echo "   - Getting $PKG"
 			$DL_PRG $DL_PRG_OPTS ${DL_HOST}/$PKG
 		else
-			echo " -> $pkgfile already exists."
+			echo "  -> $pkgfile already exists."
 		fi
 		if [ "$SIG_CHECK" == "1" ]; then
 			if [ ! -f $pkgfile.asc ]; then
