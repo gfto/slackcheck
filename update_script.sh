@@ -82,7 +82,7 @@ mkdir ${REMOTE_DIR} 2>/dev/null
 		if [ ! -f $pkgfile ]; then
 			$DL_PRG $DL_PRG_OPTS ${DL_HOST}/$PKG
 		else
-			echo "$pkgfile already exists."
+			echo " -> $pkgfile already exists."
 		fi
 		if [ "$SIG_CHECK" == "1" ]; then
 			if [ ! -f $pkgfile.asc ]; then
@@ -108,7 +108,7 @@ mkdir ${REMOTE_DIR} 2>/dev/null
 		echo "===> Checking digital signatures..."
 		for PKG in $UPDATE; do
 			pkgfile=`basename $PKG`
-			echo "Checking digital signature of $pkgfile:"
+			echo " -> Checking digital signature of $pkgfile:"
 			gpg --verify ${pkgfile}.asc
 		done
 	fi
@@ -118,10 +118,23 @@ mkdir ${REMOTE_DIR} 2>/dev/null
 		pkgfile=`basename $PKG`
 		upgradepkg ${pkgfile}
 	done
+
 	if [ "$REMOTE_DIR_DEL" = "1" ]; then
 		echo "===> Deleting '${REMOTE_DIR}' directory..."
 		cd ..
 		rm -rfv ${REMOTE_DIR}
+	fi
+
+	if [ "$SMART_UPGRADE" = "1" ]; then
+		echo "===> Finishing upgrades..."
+		LILO_UPGRADED="0"
+		KERNEL_UPGRADED="0"
+		echo $UPDATE | grep lilo-   >/dev/null 2>&1 && LILO_UPGRADED="1"
+		echo $UPDATE | grep kernel- >/dev/null 2>&1 && KERNEL_UPGRADED="1"
+		if [ "$LILO_UPGRADED" = "1" -o "$KERNEL_UPGRADED" = "1" ]; then
+			echo " -> lilo or kernel were upgraded. Running '/sbin/lilo'..."
+			/sbin/lilo
+		fi
 	fi
 )
 
