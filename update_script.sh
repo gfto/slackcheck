@@ -76,6 +76,15 @@ pkg_install() {
 	installpkg `basename $PKG`
 }
 
+pkg_upgrade() {
+	MSG="$1"
+	PKG="$2"
+	OLD="$3"
+	echo $MSG
+	$DL_PRG $DL_PRG_OPTS ${DL_HOST}/$PKG.tgz
+	upgradepkg ${OLD}%`basename $PKG`
+}
+
 mkdir ${REMOTE_DIR} 2>/dev/null
 
 (
@@ -147,6 +156,14 @@ mkdir ${REMOTE_DIR} 2>/dev/null
 			removepkg fileutils
 			removepkg textutils
 			removepkg sh-utils
+		fi
+	fi
+
+	# Replace modutils with module-init-tools, for more info see
+	# slackware-current ChangeLog (Thu Sep 4 19:40:01 PDT 2003)
+	if [ "$PKG_MODULEINITTOOLS" != "" ]; then
+		if [ "`ls /var/adm/packages/module-init-tools-* 2>/dev/null`" = "" ]; then
+			pkg_upgrade "module-init-tools package is not installed! Installing it." $PKG_MODULEINITTOOLS modutils
 		fi
 	fi
 

@@ -1,7 +1,7 @@
 #!/bin/sh
 # SlackCheck
 #
-# $Id: slcheck.sh,v 1.20 2003/06/12 20:06:07 gf Exp $
+# $Id: slcheck.sh,v 1.21 2003/09/05 16:05:52 gf Exp $
 #
 # Copyright (c) 2002 Georgi Chorbadzhiyski, Sofia, Bulgaria
 # All rights reserved.
@@ -188,6 +188,7 @@ UPDATE=\"\$UPDATE ${distro_package}.tgz\" # EXISTING: ${hostpkg} \
 				 echo "PKG_SED=\"`grep sed- ${DIR_PKG}/${FILE_NEWEST} 2>/dev/null`\"";
 				 echo "PKG_COREUTILS=\"`grep coreutils- ${DIR_PKG}/${FILE_NEWEST} 2>/dev/null`\"";
 				 echo "PKG_UTEMPTER=\"`grep utempter- ${DIR_PKG}/${FILE_NEWEST} 2>/dev/null`\"";
+				 echo "PKG_MODULEINITTOOLS=\"`grep module-init-tools- ${DIR_PKG}/${FILE_NEWEST} 2>/dev/null`\"";
 				 echo
 				 grep -v ^# update_script.sh
 				) > ${DIR_UPD}/${FILE_UPDATES}${HOST}
