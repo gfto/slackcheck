@@ -82,12 +82,15 @@ mkdir ${REMOTE_DIR} 2>/dev/null
 			$DL_PRG $DL_PRG_OPTS ${DL_HOST}/$PKG.asc
 			# Generate file file MD5 sums for this package
 			grep $pkgfile CHECKSUMS.md5 | sed -e 's|\./.*/||' > ${pkgfile}.md5
+		else
+			echo "$pkgfile already exists."
 		fi
 	done
 
 	if [ "$MD5_CHECK" == "1" ]; then
 		echo "===> Checking MD5 sums..."
 		for PKG in $UPDATE; do
+			pkgfile=`basename $PKG`
 			md5sum -c ${pkgfile}.md5
 		done
 	fi
@@ -95,8 +98,9 @@ mkdir ${REMOTE_DIR} 2>/dev/null
 	if [ "$SIG_CHECK" == "1" ]; then
 		echo "===> Checking digital signatures..."
 		for PKG in $UPDATE; do
-			echo "Checking digital signature of $fname:"
-			gpg --verify ${fname}.asc
+			pkgfile=`basename $PKG`
+			echo "Checking digital signature of $pkgfile:"
+			gpg --verify ${pkgfile}.asc
 		done
 	fi
 
