@@ -1,7 +1,7 @@
 #!/bin/sh
 # SlackCheck
 #
-# $Id: slcheck.sh,v 1.10 2003/03/09 22:56:54 gf Exp $
+# $Id: slcheck.sh,v 1.11 2003/03/11 14:52:23 gf Exp $
 #
 # Copyright (c) 2002 Georgi Chorbadzhiyski, Sofia, Bulgaria
 # All rights reserved.
@@ -183,6 +183,8 @@ UPDATE=\"\$UPDATE ${pkgdir}/${pkgname}.tgz\" # EXISTING: ${mypack} \
 					grep -v a/glibc | \
 					grep -v a/elflibs | \
 					grep -v a/pkgtools
+				 # sed workaround
+				 echo "SED_PKG=\"`grep sed- ${DIR_PKG}/${FILE_NEWEST} 2>/dev/null`\"";
 				 echo
 				 grep -v ^# update_script.sh
 				) > ${DIR_UPD}/${FILE_UPDATES}${HOST}
