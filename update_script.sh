@@ -68,6 +68,14 @@ if [ "$SIG_CHECK" == "1" ]; then
 	fi
 fi
 
+pkg_install() {
+	MSG="$1"
+	PKG="$2"
+	echo $MSG
+	$DL_PRG $DL_PRG_OPTS ${DL_HOST}/$PKG.tgz
+	installpkg `basename $PKG`
+}
+
 mkdir ${REMOTE_DIR} 2>/dev/null
 
 (
@@ -127,32 +135,27 @@ mkdir ${REMOTE_DIR} 2>/dev/null
 		# however sed is used by pkgtools so this hack is needed
 		# to allow clear 8.1 -> 9.0 upgrading
 		if [ "`which sed 2>/dev/null`" != "/usr/bin/sed" ]; then
-			echo "Bin upgraded! sed needs to be installed."
-			$DL_PRG $DL_PRG_OPTS ${DL_HOST}/$SED_PKG.tgz
-			installpkg `basename $SED_PKG`
+			pkg_install "Bin upgraded! sed needs to be installed." $PKG_SED
 		fi
 	done
 
 	# Workaround for coreutils, for more info see
-	# slackware-crrent ChangeLog (Wed May 21 16:05:37 PDT 2003)
-	if [ "$COREUTILS_PKG" != "" ]; then
-		# If coreutils are not yet installed, install them
-		# and remove fileutils, textutils and sh-utils packages
-		if [ "`ls /var/adm/packages/coreutils-* 2>/dev/null`" = "" ]
-		then
-			echo "Coreutils package is not installed! Installing it."
-			$DL_PRG $DL_PRG_OPTS ${DL_HOST}/$COREUTILS_PKG.tgz
-			installpkg `basename $COREUTILS_PKG`
+	# slackware-current ChangeLog (Wed May 21 16:05:37 PDT 2003)
+	if [ "$PKG_COREUTILS" != "" ]; then
+		if [ "`ls /var/adm/packages/coreutils-* 2>/dev/null`" = "" ]; then
+			pkg_install "Coreutils package is not installed! Installing it." $PKG_COREUTILS
 			removepkg fileutils
 			removepkg textutils
 			removepkg sh-utils
 		fi
 	fi
 
-	if [ "$REMOTE_DIR_DEL" = "1" ]; then
-		echo "===> Deleting '${REMOTE_DIR}' directory..."
-		cd ..
-		rm -rfv ${REMOTE_DIR}
+	# Workaround for utempter, for more info see
+	# slackware-current ChangeLog (Sun Jun 8 20:53:01 PDT 2003)
+	if [ "$PKG_UTEMPTER" != "" ]; then
+		if [ "`ls /var/adm/packages/utempter-* 2>/dev/null`" = "" ]; then
+			pkg_install "Utempter package is not installed! Installing it." $PKG_UTEMPTER
+		fi
 	fi
 
 	if [ "$SMART_UPGRADE" = "1" ]; then
@@ -166,5 +169,12 @@ mkdir ${REMOTE_DIR} 2>/dev/null
 			/sbin/lilo
 		fi
 	fi
+
+	if [ "$REMOTE_DIR_DEL" = "1" ]; then
+		echo "===> Deleting '${REMOTE_DIR}' directory..."
+		cd ..
+		rm -rfv ${REMOTE_DIR}
+	fi
 )
+
 
