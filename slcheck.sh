@@ -1,7 +1,7 @@
 #!/bin/sh
 # SlackCheck
 #
-# $Id: slcheck.sh,v 1.15 2003/04/09 14:14:19 gf Exp $
+# $Id: slcheck.sh,v 1.16 2003/04/09 14:28:42 gf Exp $
 #
 # Copyright (c) 2002 Georgi Chorbadzhiyski, Sofia, Bulgaria
 # All rights reserved.
@@ -24,7 +24,7 @@
 #  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-echo "SlackCheck v2.30"
+echo "SlackCheck v2.40"
 echo
 
 cd $(dirname $0)
@@ -78,6 +78,10 @@ sync_master_list() {
 	# Parse file
 	grep .tgz$ CHECKSUMS.md5 | grep patches | cut -d" " -f3 | sed -e 's|.tgz||;s|\./||' > ../${FILE_NEWEST}
 	grep .tgz$ CHECKSUMS.md5 | grep slackware | cut -d" " -f3 | sed -e 's|.tgz||;s|\./||' >> ../${FILE_NEWEST}
+	if [ $(LANG=C ls -l ../${FILE_NEWEST} | tr -s ' ' | cut -d" " -f 5) = "0" ]
+	then
+		grep .tgz$ CHECKSUMS.md5 | cut -d" " -f3 | sed -e 's|.tgz||;s|\./||' >> ../${FILE_NEWEST}
+	fi
 	cd ..
 	rm -rf $TMPDIR 2>/dev/null
 }
