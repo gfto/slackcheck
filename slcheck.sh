@@ -1,7 +1,7 @@
 #!/bin/sh
 # SlackCheck
 #
-# $Id: slcheck.sh,v 1.7 2003/03/07 15:10:35 gf Exp $
+# $Id: slcheck.sh,v 1.8 2003/03/07 15:11:00 gf Exp $
 #
 # Copyright (c) 2002 Georgi Chorbadzhiyski, Sofia, Bulgaria
 # All rights reserved.
@@ -24,7 +24,7 @@
 #  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-echo "SlackCheck v1.00"
+echo "SlackCheck v2.00"
 echo
 
 cd $(dirname $0)
