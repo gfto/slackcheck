@@ -107,9 +107,7 @@ mkdir ${REMOTE_DIR} 2>/dev/null
 	echo "===> Upgrating packages..."
 	for PKG in $UPDATE; do
 		pkgfile=`basename $PKG`
-		if [ ! -f $pkgfile ]; then
-			upgradepkg ${pkgfile}
-		fi
+		upgradepkg ${pkgfile}
 	done
 	if [ "$REMOTE_DIR_DEL" = "1" ]; then
 		echo "===> Deleting '${REMOTE_DIR}' directory..."
