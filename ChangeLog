@@ -1,6 +1,10 @@
 #
-# $Id: ChangeLog,v 1.14 2004/01/05 10:02:27 gf Exp $
+# $Id: ChangeLog,v 1.15 2004/01/06 17:33:09 gf Exp $
 #
+
+ v3.10 - 06 January 2004
+   Fix stupid bug that prevents --local from working when slcheck is run from
+   root account.
 
  v3.00 - 05 January 2004
    New option that allows upgrade of local machine only. Help was improved by
