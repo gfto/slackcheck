@@ -1,12 +1,12 @@
 #!/bin/sh
 # SlackCheck configuration file
 #
-# $Id: config.sh,v 1.7 2003/04/09 14:25:10 gf Exp $
+# $Id: config.sh,v 1.8 2004/01/05 09:04:57 gf Exp $
 #
 
 PATH="/bin:/usr/bin:/usr/local/bin"
 
-# Can be 8.1, 9.0 or current
+# Can be 8.1, 9.0, 9.1 or current
 SLACK_VER="current"
 
 # Where to look for upgrades
