@@ -1,7 +1,7 @@
 #!/bin/sh
 # SlackCheck configuration file
 #
-# $Id: config.sh,v 1.6 2003/04/09 14:17:36 gf Exp $
+# $Id: config.sh,v 1.7 2003/04/09 14:25:10 gf Exp $
 #
 
 PATH="/bin:/usr/bin:/usr/local/bin"
@@ -10,6 +10,9 @@ PATH="/bin:/usr/bin:/usr/local/bin"
 SLACK_VER="current"
 
 # Where to look for upgrades
+# *** If you want patches directory to be checked this directory
+# *** must point to / directory of the slackware mirror. Not slackware/
+# *** directory.
 DL_HOST="http://mirrors.unixsol.org/slackware/slackware-${SLACK_VER}"
 #DL_HOST="http://www.slackware.no/slackware/slackware-${SLACK_VER}"
 #DL_HOST="http://www.slackware.at/data/slackware-${SLACK_VER}"
