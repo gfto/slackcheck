@@ -138,7 +138,7 @@ mkdir ${REMOTE_DIR} 2>/dev/null
 	if [ "$COREUTILS_PKG" != "" ]; then
 		# If coreutils are not yet installed, install them
 		# and remove fileutils, textutils and sh-utils packages
-		if [ `ls /var/adm/packages/coreutils-* &>/dev/null ; echo $?` = "1" ]
+		if [ "`ls /var/adm/packages/coreutils-* 2>/dev/null`" = "" ]
 		then
 			echo "Coreutils package is not installed! Installing it."
 			$DL_PRG $DL_PRG_OPTS ${DL_HOST}/$COREUTILS_PKG.tgz
