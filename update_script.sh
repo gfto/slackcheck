@@ -95,7 +95,7 @@ mkdir ${REMOTE_DIR} 2>/dev/null
 		fi
 		md5_check ${pkgfile}
 		sig_check ${pkgfile}
-		echo upgradepkg ${pkgfile}
+		upgradepkg ${pkgfile}
 	done
 	if [ "$REMOTE_DIR_DEL" = "1" ]; then
 		echo "INFO: Cleanup"
