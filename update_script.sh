@@ -117,6 +117,15 @@ mkdir ${REMOTE_DIR} 2>/dev/null
 	for PKG in $UPDATE; do
 		pkgfile=`basename $PKG`
 		upgradepkg ${pkgfile}
+		# UGLY HACK! sed was split from 'bin' package and
+		# upgrading 'bin' package will cause sed to dissapear
+		# however sed is used by pkgtools so this hack is needed
+		# to allow clear 8.1 -> 9.0 upgrading
+		if [ "`which sed 2>/dev/null`" != "/usr/bin/sed" ]; then
+			echo "Bin upgraded! sed needs to be installed."
+			$DL_PRG $DL_PRG_OPTS ${DL_HOST}/$SED_PKG.tgz
+			installpkg `basename $SED_PKG`
+		fi
 	done
 
 	if [ "$REMOTE_DIR_DEL" = "1" ]; then
