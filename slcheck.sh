@@ -1,7 +1,7 @@
 #!/bin/sh
 # SlackCheck
 #
-# $Id: slcheck.sh,v 1.2 2003/01/05 17:39:40 gf Exp $
+# $Id: slcheck.sh,v 1.3 2003/03/07 10:07:54 gf Exp $
 #
 # Copyright (c) 2002 Georgi Chorbadzhiyski, Sofia, Bulgaria
 # All rights reserved.
@@ -77,9 +77,9 @@ sync_master_list() {
 	rm -rf $TMPDIR 2>/dev/null
 	mkdir $TMPDIR && cd $TMPDIR
 	# The actual download
-	${DL_PRG} ${DL_PRG_OPTS} ${DL_HOST}/CHECKSUMS
+	${DL_PRG} ${DL_PRG_OPTS} ${DL_HOST}/CHECKSUMS.md5
 	# Parse file
-	grep .tgz$ CHECKSUMS | cut -d" " -f3 | sed -e 's|.tgz||;s|\./||' > ../${FILE_NEWEST}
+	grep .tgz$ CHECKSUMS.md5 | cut -d" " -f3 | sed -e 's|.tgz||;s|\./||' > ../${FILE_NEWEST}
 	cd ..
 	rm -rf $TMPDIR 2>/dev/null
 }
