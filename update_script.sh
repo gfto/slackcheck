@@ -70,8 +70,10 @@ mkdir ${REMOTE_DIR} 2>/dev/null
 	# Download, verify and update packages
 	set -e # Halt on any error
 	cd ${REMOTE_DIR}
-	if [ ! -f CHECKSUMS.md5 ]; then
-		$DL_PRG $DL_PRG_OPTS ${DL_HOST}/CHECKSUMS.md5
+	if [ "$MD5_CHECK" == "1" ]; then
+		if [ ! -f CHECKSUMS.md5 ]; then
+			$DL_PRG $DL_PRG_OPTS ${DL_HOST}/CHECKSUMS.md5
+		fi
 	fi
 
 	echo "===> Downloading packages..."
@@ -79,11 +81,13 @@ mkdir ${REMOTE_DIR} 2>/dev/null
 		pkgfile=`basename $PKG`
 		if [ ! -f $pkgfile ]; then
 			$DL_PRG $DL_PRG_OPTS ${DL_HOST}/$PKG
-			$DL_PRG $DL_PRG_OPTS ${DL_HOST}/$PKG.asc
-			# Generate file file MD5 sums for this package
-			grep $pkgfile CHECKSUMS.md5 | sed -e 's|\./.*/||' > ${pkgfile}.md5
 		else
 			echo "$pkgfile already exists."
+		fi
+		if [ "$SIG_CHECK" == "1" ]; then
+			if [ ! -f $pkgfile.asc ]; then
+				$DL_PRG $DL_PRG_OPTS ${DL_HOST}/$PKG.asc
+			fi
 		fi
 	done
 
@@ -91,6 +95,11 @@ mkdir ${REMOTE_DIR} 2>/dev/null
 		echo "===> Checking MD5 sums..."
 		for PKG in $UPDATE; do
 			pkgfile=`basename $PKG`
+			if [ "$SIG_CHECK" == "1" ]; then
+				grep $pkgfile CHECKSUMS.md5 | sed -e 's|\./.*/||' > ${pkgfile}.md5
+			else
+				grep $pkgfile CHECKSUMS.md5 | sed -e 's|\./.*/||' | grep -v .asc$ > ${pkgfile}.md5
+			fi
 			md5sum -c ${pkgfile}.md5
 		done
 	fi
