@@ -121,9 +121,9 @@ mkdir ${REMOTE_DIR} 2>/dev/null
 		for PKG in $UPDATE; do
 			pkgfile=`basename $PKG`
 			if [ "$SIG_CHECK" == "1" ]; then
-				grep /$pkgfile CHECKSUMS.md5 | sed -e 's|\./.*/||' > ${pkgfile}.md5
+				grep /$pkgfile CHECKSUMS.md5 | head -1 | sed -e 's|\./.*/||' > ${pkgfile}.md5
 			else
-				grep /$pkgfile CHECKSUMS.md5 | sed -e 's|\./.*/||' | grep -v .asc$ > ${pkgfile}.md5
+				grep /$pkgfile CHECKSUMS.md5 | head -1 | sed -e 's|\./.*/||' | grep -v .asc$ > ${pkgfile}.md5
 			fi
 			md5sum -c ${pkgfile}.md5
 		done
@@ -175,7 +175,8 @@ mkdir ${REMOTE_DIR} 2>/dev/null
 	# Replace modutils with module-init-tools, for more info see
 	# slackware-current ChangeLog (Thu Sep 4 19:40:01 PDT 2003)
 	if [ "$PKG_MODULEINITTOOLS" != "" ]; then
-		if [ "`ls /var/adm/packages/module-init-tools-* 2>/dev/null`" = "" ]; then
+		if [ "`ls /var/adm/packages/module-init-tools-* 2>/dev/null`" = "" -a \
+		     "`ls /var/adm/packages/modutils-* 2>/dev/null`" != "" ]; then
 			pkg_upgrade "module-init-tools package is not installed! Installing it." $PKG_MODULEINITTOOLS modutils
 		fi
 	fi
