@@ -1,7 +1,7 @@
 #!/bin/sh
 # SlackCheck
 #
-# $Id: slcheck.sh,v 1.24 2004/01/05 10:03:03 gf Exp $
+# $Id: slcheck.sh,v 1.25 2004/01/06 17:31:18 gf Exp $
 #
 # Copyright (c) 2002-2004 Georgi Chorbadzhiyski, Sofia, Bulgaria
 # All rights reserved.
@@ -232,7 +232,7 @@ upgrade_machines() {
 					echo "       Enter root password"
 					su -c "/bin/sh ${DIR_UPD}/${FILE_UPDATES}${HOST}"
 				else
-					${DIR_UPD}/${FILE_UPDATES}${HOST}
+					/bin/sh ${DIR_UPD}/${FILE_UPDATES}${HOST}
 				fi
 			# Remote host
 			else
