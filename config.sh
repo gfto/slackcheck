@@ -1,16 +1,19 @@
 #!/bin/sh
 # SlackCheck configuration file
 #
-# $Id: config.sh,v 1.4 2003/03/09 22:36:13 gf Exp $
+# $Id: config.sh,v 1.5 2003/04/08 12:05:06 gf Exp $
 #
 
 PATH="/bin:/usr/bin:/usr/local/bin"
 
+# Can be 8.1, 9.0 or current
+SLACK_VER="current"
+
 # Where to look for upgrades
-DL_HOST="http://mirrors.unixsol.org/slackware/slackware-current/slackware"
-#DL_HOST="http://www.slackware.at/data/slackware-current/slackware"
-#DL_HOST="http://ftp.planetmirror.com/pub/slackware/slackware-current/slackware"
-#DL_HOST="ftp://ftp.slackware.com/pub/slackware/slackware-current/slackware"
+DL_HOST="http://mirrors.unixsol.org/slackware/slackware-${SLACK_VER}/slackware"
+#DL_HOST="http://www.slackware.at/data/slackware-${SLACK_VER}/slackware"
+#DL_HOST="http://ftp.planetmirror.com/pub/slackware/slackware-${SLACK_VER}/slackware"
+#DL_HOST="ftp://ftp.slackware.com/pub/slackware/slackware-${SLACK_VER}/slackware"
 
 # Set variable to "0" if you dont want some of the functionality
 
@@ -31,13 +34,17 @@ SMART_UPGRADE="1"         # When lilo-* or kernel-* packages are updated run
 
 # This program will be used to download files from web
 DL_PRG="wget"
-DL_PRG_OPTS="-nv"
+
+# Non-verbose mode of the new wget is fucked up. It shows what is downloaded
+# after finishing the download and I think thats very irritating
+#DL_PRG_OPTS="-nv"
 
 # Used for ftp downloads
 echo $DL_HOST | grep ^ftp://
 if [ $? = 0 ]; then
 	DL_PRG="wget"
-	DL_PRG_OPTS="-nv --passive"
+	DL_PRG_OPTS="--passive"
+#	DL_PRG_OPTS="-nv --passive"
 fi
 
 # These programs will be used in collection and updating hosts
