@@ -101,9 +101,9 @@ mkdir ${REMOTE_DIR} 2>/dev/null
 		for PKG in $UPDATE; do
 			pkgfile=`basename $PKG`
 			if [ "$SIG_CHECK" == "1" ]; then
-				grep $pkgfile CHECKSUMS.md5 | sed -e 's|\./.*/||' > ${pkgfile}.md5
+				grep /$pkgfile CHECKSUMS.md5 | sed -e 's|\./.*/||' > ${pkgfile}.md5
 			else
-				grep $pkgfile CHECKSUMS.md5 | sed -e 's|\./.*/||' | grep -v .asc$ > ${pkgfile}.md5
+				grep /$pkgfile CHECKSUMS.md5 | sed -e 's|\./.*/||' | grep -v .asc$ > ${pkgfile}.md5
 			fi
 			md5sum -c ${pkgfile}.md5
 		done
