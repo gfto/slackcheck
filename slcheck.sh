@@ -1,7 +1,7 @@
 #!/bin/sh
 # SlackCheck
 #
-# $Id: slcheck.sh,v 1.4 2003/03/07 13:35:09 gf Exp $
+# $Id: slcheck.sh,v 1.5 2003/03/07 14:02:47 gf Exp $
 #
 # Copyright (c) 2002 Georgi Chorbadzhiyski, Sofia, Bulgaria
 # All rights reserved.
@@ -165,7 +165,7 @@ UPDATE=\"\$UPDATE ${pkgdir}/${pkgname}.tgz\" # EXISTING: ${mypack} \
 				 echo "DL_PRG_OPTS=\"${DL_PRG_OPTS}\""
 				 echo
 				 echo "MD5_CHECK=\"${MD5_CHECK}\""
-				 echo "SIG_CHECK=\"${SIG_HOST}\""
+				 echo "SIG_CHECK=\"${SIG_CHECK}\""
 				 echo
 				 echo "REMOTE_DIR=\"${REMOTE_DIR}\""
 				 echo "REMOTE_DIR_DEL=\"${REMOTE_DIR_DEL}\""
