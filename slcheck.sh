@@ -1,7 +1,7 @@
 #!/bin/sh
 # SlackCheck
 #
-# $Id: slcheck.sh,v 1.27 2004/06/02 19:54:24 gf Exp $
+# $Id: slcheck.sh,v 1.28 2005/01/28 12:47:46 gf Exp $
 #
 # Copyright (c) 2002-2004 Georgi Chorbadzhiyski, Sofia, Bulgaria
 # All rights reserved.
@@ -24,7 +24,7 @@
 #  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-echo "SlackCheck v3.20"
+echo "SlackCheck v3.30"
 echo
 
 cd $(dirname $0)
@@ -48,7 +48,7 @@ usage() {
 	echo "   --host h1 h2 h3   Upgrade this host(s)"
 	echo "     --file filename Read list of hosts from this file"
 	echo
-	echo "   --sync            Download latest list of packages from the WWW/FTP"
+	echo "   --sync            Get latest list of packages from the WWW/FTP/Local file"
 	echo
 	echo "   --collect         Build package lists for hosts that'll be upgraded"
 	echo
@@ -74,7 +74,7 @@ usage() {
 	exit 1
 }
 
-# Download newest package list
+# Get newest package list
 sync_master_list() {
 	echo "===> Getting newest package list..."
 	mkdir $DIR_PKG 2>/dev/null
@@ -82,8 +82,9 @@ sync_master_list() {
 	TMPDIR=".Tmp"
 	rm -rf $TMPDIR 2>/dev/null
 	mkdir $TMPDIR && cd $TMPDIR
-	# The actual download
+
 	${DL_PRG} ${DL_PRG_OPTS} ${DL_HOST}/CHECKSUMS.md5
+
 	# Parse file
 	grep .tgz$ CHECKSUMS.md5 | grep patches | cut -d" " -f3 | sed -e 's|.tgz||;s|\./||' > ../${FILE_NEWEST}
 	grep .tgz$ CHECKSUMS.md5 | grep slackware | cut -d" " -f3 | sed -e 's|.tgz||;s|\./||' >> ../${FILE_NEWEST}
@@ -195,7 +196,8 @@ UPDATE=\"\$UPDATE ${distro_package}.tgz\" # EXISTING: ${hostpkg} \
 				 cat ${DIR_UPD}/${FILE_UPDATES}${HOST}.newpkgs | \
 					grep -v a/glibc | \
 					grep -v a/elflibs | \
-					grep -v a/pkgtools
+					grep -v a/pkgtools | \
+					grep -v a/aaa_elflibs
 				 # workarounds
 				 echo "PKG_SED=\"`grep sed- ${DIR_PKG}/${FILE_NEWEST} 2>/dev/null`\"";
 				 echo "PKG_COREUTILS=\"`grep coreutils- ${DIR_PKG}/${FILE_NEWEST} 2>/dev/null`\"";
