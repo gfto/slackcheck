@@ -1,9 +1,12 @@
 #
-# $Id: ChangeLog,v 1.11 2003/05/25 16:28:17 gf Exp $
+# $Id: ChangeLog,v 1.12 2003/06/12 20:16:19 gf Exp $
 #
 
+ v2.70 - 12 June 2003
+   A workaround has been added for the utempter package in slackware-current.
+
  v2.60 - 25 May 2003
-   Add workaround for coreutils package added in slackware-current.
+   A workaround has been added for the coreutils package in slackware-current.
 
  v2.50 - 18 Apr 2003
    Rewritten detection of updated packages. The logic now is less error prone.
