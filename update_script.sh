@@ -133,6 +133,22 @@ mkdir ${REMOTE_DIR} 2>/dev/null
 		fi
 	done
 
+	# Workaround for coreutils, for more info see
+	# slackware-crrent ChangeLog (Wed May 21 16:05:37 PDT 2003)
+	if [ "$COREUTILS_PKG" != "" ]; then
+		# If coreutils are not yet installed, install them
+		# and remove fileutils, textutils and sh-utils packages
+		if [ `ls /var/adm/packages/coreutils-* &>/dev/null ; echo $?` = "1" ]
+		then
+			echo "Coreutils package is not installed! Installing it."
+			$DL_PRG $DL_PRG_OPTS ${DL_HOST}/$COREUTILS_PKG.tgz
+			installpkg `basename $COREUTILS_PKG`
+			removepkg fileutils
+			removepkg textutils
+			removepkg sh-utils
+		fi
+	fi
+
 	if [ "$REMOTE_DIR_DEL" = "1" ]; then
 		echo "===> Deleting '${REMOTE_DIR}' directory..."
 		cd ..
