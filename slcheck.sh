@@ -1,7 +1,7 @@
 #!/bin/sh
 # SlackCheck
 #
-# $Id: slcheck.sh,v 1.23 2004/01/05 09:19:56 gf Exp $
+# $Id: slcheck.sh,v 1.24 2004/01/05 10:03:03 gf Exp $
 #
 # Copyright (c) 2002-2004 Georgi Chorbadzhiyski, Sofia, Bulgaria
 # All rights reserved.
@@ -24,7 +24,7 @@
 #  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-echo "SlackCheck v2.80"
+echo "SlackCheck v3.00"
 echo
 
 cd $(dirname $0)
@@ -43,23 +43,32 @@ usage() {
 	echo "Usage: $(basename $0) [options]"
 	echo
 	echo " OPTIONS:"
+	echo
+	echo "   --local           Operate on local machine"
 	echo "   --host h1 h2 h3   Upgrade this host(s)"
-	echo "   --file filename   Get hosts list from this file"
+	echo "     --file filename Read list of hosts from this file"
 	echo
-	echo "   --sync            Download newest list of packages"
-	echo "   --collect         Collect list of installed packages from hosts"
+	echo "   --sync            Download latest list of packages from the WWW/FTP"
+	echo
+	echo "   --collect         Build package lists for hosts that'll be upgraded"
+	echo
 	echo "   --gen             Generate upgrade scripts"
-	echo "   --dist            Copy upgrade scripts to hosts"
-	echo "   --upgrade         Upgrade hosts using generated scripts"
 	echo
-	echo " QUICK USAGE:"
+	echo "   --upgrade         Upgrade hosts using generated scripts"
+	echo "   --dist            Only copy upgrade scripts to hosts, do not updgrade"
+	echo
+	echo " HOW TO UPGRADE CURRENT HOST"
+	echo "   Run:  $(basename $0) --local --sync --collect --gen --upgrade"
+	echo
+	echo " HOW TO UPGRADE MULTIPLE HOSTS:"
+	echo "   Edit: \"update_hosts\" file to add your slackware machines"
 	echo "   Run:  $(basename $0) --sync --collect --gen"
 	echo "   Edit: ${DIR_UPD}/${FILE_UPDATES}*"
-	echo "   Run:  $(basename $0) --dist (for manual upgrade after that)"
-	echo "    or"
 	echo "   Run:  $(basename $0) --upgrade (for automatic upgrade)"
+	echo "    or"
+	echo "   Run:  $(basename $0) --dist (for manual upgrade after that)"
 	echo
-	echo " TO UPDATE SINGLE HOST:"
+	echo " HOW TO UPGRADE SINGLE HOST:"
 	echo "   Run:  $(basename $0) --host blah.example.org --sync --collect --gen --upgrade"
 	echo
 	exit 1
@@ -94,7 +103,10 @@ collect_package_lists() {
 	do
 		echo "  ---> $HOST"
 		# Localhost
-		if [ "$HOST" == "$(hostname)" -o "$HOST" == "$(hostname -a)" ]; then
+		if [ "$HOST" == "$(hostname)" -o \
+		     "$HOST" == "$(hostname -f)" -o \
+		     "$HOST" == "localhost" ]
+		then
 			ls /var/log/packages > ${DIR_PKG}/$HOST
 		# Remote host
 		else
@@ -209,11 +221,27 @@ upgrade_machines() {
 	do
 		if [ -f ${DIR_UPD}/${FILE_UPDATES}${HOST} ]
 		then
-			echo "  ---> $HOST"
-			cat ${DIR_UPD}/${FILE_UPDATES}${HOST} | \
-				${RSH_UPGRADE} ${HOST} \
-					"cat - > ${FILE_UPDATES}${HOST}_${NOW}; \
-					/bin/sh ${FILE_UPDATES}${HOST}_${NOW};"
+			# Localhost
+			if [ "$HOST" == "$(hostname)" -o \
+			     "$HOST" == "$(hostname -f)" -o \
+			     "$HOST" == "localhost" ]
+			then
+				echo "  ---> $HOST (Local machine)"
+				# Use su if we're running not as root
+				if [ "$(id -u)" != "0" ]; then
+					echo "       Enter root password"
+					su -c "/bin/sh ${DIR_UPD}/${FILE_UPDATES}${HOST}"
+				else
+					${DIR_UPD}/${FILE_UPDATES}${HOST}
+				fi
+			# Remote host
+			else
+				echo "  ---> $HOST"
+				cat ${DIR_UPD}/${FILE_UPDATES}${HOST} | \
+					${RSH_UPGRADE} ${HOST} \
+						"cat - > ${FILE_UPDATES}${HOST}_${NOW}; \
+						/bin/sh ${FILE_UPDATES}${HOST}_${NOW};"
+			fi
 		fi
 	done
 }
@@ -226,10 +254,19 @@ distribute_up_scripts() {
 	do
 		if [ -f ${DIR_UPD}/${FILE_UPDATES}${HOST} ]
 		then
-			echo "  ---> $HOST"
-			cat ${DIR_UPD}/${FILE_UPDATES}${HOST} | \
-				${RSH_UPGRADE} ${HOST} \
-					"cat - > ${FILE_UPDATES}${HOST}_${NOW}"
+			# Localhost
+			if [ "$HOST" == "$(hostname)" -o \
+			     "$HOST" == "$(hostname -f)" -o \
+			     "$HOST" == "localhost" ]
+			then
+				echo "  ---> $HOST (Local machine - no need to copy upgrade script)"
+			# Remote host
+			else
+				echo "  ---> $HOST"
+				cat ${DIR_UPD}/${FILE_UPDATES}${HOST} | \
+					${RSH_UPGRADE} ${HOST} \
+						"cat - > ${FILE_UPDATES}${HOST}_${NOW}"
+			fi
 		fi
 	done
 }
@@ -243,6 +280,9 @@ while [ "$1" != "" ]; do
 	param=$1
 	shift
 	case "$param" in
+		--local)
+			SLACK_HOSTS="localhost"
+		;;
 		--host)
 			if [ "$1" != "" ]; then
 				SLACK_HOSTS=""
