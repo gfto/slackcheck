@@ -1,7 +1,7 @@
 #!/bin/sh
 # SlackCheck
 #
-# $Id: slcheck.sh,v 1.1 2003/01/05 08:26:12 gf Exp $
+# $Id: slcheck.sh,v 1.2 2003/01/05 17:39:40 gf Exp $
 #
 # Copyright (c) 2002 Georgi Chorbadzhiyski, Sofia, Bulgaria
 # All rights reserved.
@@ -70,7 +70,7 @@ usage() {
 
 # Download newest package list
 sync_master_list() {
-	echo -n "Getting newest package list. "
+	echo "Getting newest package list."
 	mkdir $DIR_PKG 2>/dev/null
 	cd $DIR_PKG
 	TMPDIR=".Tmp"
@@ -82,11 +82,11 @@ sync_master_list() {
 	grep .tgz$ CHECKSUMS | cut -d" " -f3 | sed -e 's|.tgz||;s|\./||' > ../${FILE_NEWEST}
 	cd ..
 	rm -rf $TMPDIR 2>/dev/null
-	echo "Done."
 }
 
 # Generate list of packages for every host
 collect_package_lists() {
+	[ -d $DIR_PKG ] || mkdir -p $DIR_PKG
 	for HOST in $SLACK_HOSTS
 	do
 		echo -n "Collection package list from \"$HOST\". "
@@ -96,7 +96,7 @@ collect_package_lists() {
 		# Remote host
 		else
 			${RSH_LISTS} $HOST "ls /var/log/packages" > ${DIR_PKG}/${HOST}.tmp
-			mv ${DIR_PKG}/${HOST}.tmp ${DIR_PKG}/${HOST}
+			mv ${DIR_PKG}/${HOST}.tmp ${DIR_PKG}/${HOST} 2>/dev/null
 		fi
 		echo "Done."
 	done
@@ -239,19 +239,19 @@ while [ "$1" != "" ]; do
 	shift
 	case "$param" in
 		--sync)
-			sync_master_list
+			(sync_master_list)
 		;;
 		--collect)
-			collect_package_lists
+			(collect_package_lists)
 		;;
 		--gen)
-			generate_upgrade_scripts
+			(generate_upgrade_scripts)
 		;;
 		--dist)
-			distribute_up_scripts
+			(distribute_up_scripts)
 		;;
 		--upgrade)
-			upgrade_machines
+			(upgrade_machines)
 		;;
 		*)
 			usage
