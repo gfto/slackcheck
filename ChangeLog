@@ -1,6 +1,12 @@
 #
-# $Id: ChangeLog,v 1.7 2003/03/16 13:10:14 gf Exp $
+# $Id: ChangeLog,v 1.8 2003/04/09 14:30:20 gf Exp $
 #
+
+ v2.40 - 09 Apr 2003
+   Use CHECKSUMS.md5 from / directory. This allows patches/ directory to be
+   scanned also. Please update your config.sh file!
+   Fix wrong md5 sums file generation.
+   Don't use non-verbose mode for wget. It's broken in the latest wget release.
 
  v2.30 - 16 Mar 2003
    Remove checks for program existence if xxx_CHECK features are not used.
