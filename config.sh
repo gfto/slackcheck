@@ -1,7 +1,7 @@
 #!/bin/sh
 # SlackCheck configuration file
 #
-# $Id: config.sh,v 1.3 2003/03/07 14:02:14 gf Exp $
+# $Id: config.sh,v 1.4 2003/03/09 22:36:13 gf Exp $
 #
 
 PATH="/bin:/usr/bin:/usr/local/bin"
@@ -11,6 +11,8 @@ DL_HOST="http://mirrors.unixsol.org/slackware/slackware-current/slackware"
 #DL_HOST="http://www.slackware.at/data/slackware-current/slackware"
 #DL_HOST="http://ftp.planetmirror.com/pub/slackware/slackware-current/slackware"
 #DL_HOST="ftp://ftp.slackware.com/pub/slackware/slackware-current/slackware"
+
+# Set variable to "0" if you dont want some of the functionality
 
 MD5_CHECK="1"             # Check md5 sums of downloaded packages
 SIG_CHECK="1"             # Check digital signatures of downloaded packages
@@ -22,6 +24,10 @@ REMOTE_DIR="Updates"      # Upgraded packages will be downloaded in this
                           # this variable per host
 REMOTE_DIR_DEL="1"        # Delete directory with downloaded packages after
                           # finishing updates
+
+SMART_UPGRADE="1"         # When lilo-* or kernel-* packages are updated run
+                          # "lilo" command. If lilo is not run after upgrading
+                          # these packages, your system probably wont boot.
 
 # This program will be used to download files from web
 DL_PRG="wget"
