@@ -1,6 +1,14 @@
 #
-# $Id: ChangeLog,v 1.16 2004/06/02 19:54:51 gf Exp $
+# $Id: ChangeLog,v 1.17 2005/01/28 12:46:07 gf Exp $
 #
+
+ v3.30 - 29 January 2005
+   Do not try to upgrade aaa_elflibs package. As Pat's says, this package
+   should be installed initially and then never upgraded. For more info
+   see Slackware-current ChangeLog from Mon Jan 24 20:41:03 PST 2005
+
+   An example has been added on how to use slackcheck to update packages
+   using Slackware CD (see config.sh)
 
  v3.20 - 02 June 2004
    A bug was fixed that was preventing correct checksum validation when two
