@@ -2,44 +2,37 @@
 # Put one host per line
 # Lines starting with # and empty lines are skipped
 #
-# $Id: update_hosts,v 1.4 2003/09/01 14:09:51 gf Exp $
+# $Id: update_hosts,v 1.5 2004/08/03 13:32:02 gf Exp $
 #
 
 atilla
+billdb
+billing
 cable-gf
+db
 dvl00
-exmatrix
-game
+flirt4e
 gf
 ggenov
-gw0
 host
 man
 noname
 ns
-ns.top.bg
+pbx
 peter
-pl300
 router
 rumi
 sato
 sc
 slavej
 sounder
+starlight
 stoill
+support1
+#support2
 work
-irc.top.bg
-matrix.top.bg
-user.top.bg
-www.top.bg
-zv0
-zv1
-zv2
-zv3
-zv4
-zv5
-zv6
-zvsupport1
-zvsupport2
-zvsupport3
-zvsupport4
+#ns.top.bg
+#irc.top.bg
+#matrix.top.bg
+#user.top.bg
+#www.top.bg
