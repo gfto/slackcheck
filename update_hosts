@@ -1,0 +1,18 @@
+# In this file are listed hosts that'll upgraded by SlackCheck
+# Put one host per line
+# Lines starting with # and empty lines are skipped
+#
+# $Id: update_hosts,v 1.1 2003/03/07 12:36:26 gf Exp $
+#
+
+router
+ns
+work
+man
+host
+gf
+pl300
+sounder
+game
+noname
+gw0
