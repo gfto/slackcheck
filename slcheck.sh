@@ -1,7 +1,7 @@
 #!/bin/sh
 # SlackCheck
 #
-# $Id: slcheck.sh,v 1.6 2003/03/07 14:46:28 gf Exp $
+# $Id: slcheck.sh,v 1.7 2003/03/07 15:10:35 gf Exp $
 #
 # Copyright (c) 2002 Georgi Chorbadzhiyski, Sofia, Bulgaria
 # All rights reserved.
@@ -34,7 +34,7 @@ INC_CONFIG="0"
 
 if [ "$INC_CONFIG" = "0" ]
 then
-	echo "Error including ./config.sh"
+	echo "*** Error including ./config.sh"
 	exit
 fi
 
@@ -67,7 +67,7 @@ usage() {
 
 # Download newest package list
 sync_master_list() {
-	echo "Getting newest package list."
+	echo "===> Getting newest package list..."
 	mkdir $DIR_PKG 2>/dev/null
 	cd $DIR_PKG
 	TMPDIR=".Tmp"
@@ -84,9 +84,10 @@ sync_master_list() {
 # Generate list of packages for every host
 collect_package_lists() {
 	[ -d $DIR_PKG ] || mkdir -p $DIR_PKG
+	echo "===> Collecting package lists..."
 	for HOST in $SLACK_HOSTS
 	do
-		echo -n "Collection package list from \"$HOST\". "
+		echo "  ---> $HOST"
 		# Localhost
 		if [ "$HOST" == "$(hostname)" -o "$HOST" == "$(hostname -a)" ]; then
 			ls /var/log/packages > ${DIR_PKG}/$HOST
@@ -95,7 +96,6 @@ collect_package_lists() {
 			${RSH_LISTS} $HOST "ls /var/log/packages" > ${DIR_PKG}/${HOST}.tmp
 			mv ${DIR_PKG}/${HOST}.tmp ${DIR_PKG}/${HOST} 2>/dev/null
 		fi
-		echo "Done."
 	done
 }
 
@@ -112,18 +112,19 @@ package_name() {
 # Generate upgrade scripts
 generate_upgrade_scripts() {
 	mkdir ${DIR_UPD} 2>/dev/null
+	echo "===> Generating upgrade scripts..."
 	for i in $SLACK_HOSTS
 	do
 		# Remove directory
-		host=$(echo $i | cut -d/ -f2)
+		HOST=$(echo $i | cut -d/ -f2)
 		# Check if package list exist
-		if [ -f ${DIR_PKG}/${host} ]
+		if [ -f ${DIR_PKG}/${HOST} ]
 		then
-			echo -n "Generating upgrade script for \"$host\". "
+			echo -n "$HOST "
 			# Cleanup old files
-			rm ${DIR_UPD}/${FILE_UNKPACKS}${host}  >/dev/null 2>&1
-			rm ${DIR_UPD}/${FILE_UPDATES}${host}   >/dev/null 2>&1
-			rm ${DIR_UPD}/${FILE_UPDATES}${host}.* >/dev/null 2>&1
+			rm ${DIR_UPD}/${FILE_UNKPACKS}${HOST}  >/dev/null 2>&1
+			rm ${DIR_UPD}/${FILE_UPDATES}${HOST}   >/dev/null 2>&1
+			rm ${DIR_UPD}/${FILE_UPDATES}${HOST}.* >/dev/null 2>&1
 			# For each package
 			while read mypack; do
 				mypack=$(echo "$mypack" | tr -s ' ' | cut -d" " -f11)
@@ -142,18 +143,18 @@ generate_upgrade_scripts() {
 						tgzpath="${pkgdir}/${pkgname}.tgz"
 						echo "\
 UPDATE=\"\$UPDATE ${pkgdir}/${pkgname}.tgz\" # EXISTING: ${mypack} \
-" >> ${DIR_UPD}/${FILE_UPDATES}${host}.newpkgs
+" >> ${DIR_UPD}/${FILE_UPDATES}${HOST}.newpkgs
 					# Add to unknown packages
 					else
-						echo "$mypack" >> ${DIR_UPD}/${FILE_UNKPACKS}${host}
+						echo "$mypack" >> ${DIR_UPD}/${FILE_UNKPACKS}${HOST}
 					fi
 				fi
 			done < ${DIR_PKG}/$i
 			# Add intereter
-			if [ -f ${DIR_UPD}/${FILE_UPDATES}${host}.newpkgs ]
+			if [ -f ${DIR_UPD}/${FILE_UPDATES}${HOST}.newpkgs ]
 			then
-				sort ${DIR_UPD}/${FILE_UPDATES}${host}.newpkgs > .newpkgs.tmp
-				cat .newpkgs.tmp > ${DIR_UPD}/${FILE_UPDATES}${host}.newpkgs
+				sort ${DIR_UPD}/${FILE_UPDATES}${HOST}.newpkgs > .newpkgs.tmp
+				cat .newpkgs.tmp > ${DIR_UPD}/${FILE_UPDATES}${HOST}.newpkgs
 				rm .newpkgs.tmp
 				(echo '#!/bin/sh'
 				 echo
@@ -173,32 +174,33 @@ UPDATE=\"\$UPDATE ${pkgdir}/${pkgname}.tgz\" # EXISTING: ${mypack} \
 				 echo
 				 # Put glibc and elflibs updates first, otherwise
 				 # something may broke
-				 cat ${DIR_UPD}/${FILE_UPDATES}${host}.newpkgs | grep a/glibc
-				 cat ${DIR_UPD}/${FILE_UPDATES}${host}.newpkgs | grep a/elflibs
-				 cat ${DIR_UPD}/${FILE_UPDATES}${host}.newpkgs | grep a/pkgtools
-				 cat ${DIR_UPD}/${FILE_UPDATES}${host}.newpkgs | \
+				 cat ${DIR_UPD}/${FILE_UPDATES}${HOST}.newpkgs | grep a/glibc
+				 cat ${DIR_UPD}/${FILE_UPDATES}${HOST}.newpkgs | grep a/elflibs
+				 cat ${DIR_UPD}/${FILE_UPDATES}${HOST}.newpkgs | grep a/pkgtools
+				 cat ${DIR_UPD}/${FILE_UPDATES}${HOST}.newpkgs | \
 					grep -v a/glibc | \
 					grep -v a/elflibs | \
 					grep -v a/pkgtools
 				 echo
 				 grep -v ^# update_script.sh
-				) > ${DIR_UPD}/${FILE_UPDATES}${host}
+				) > ${DIR_UPD}/${FILE_UPDATES}${HOST}
 			fi
 			# Cleanup
-			rm ${DIR_UPD}/${FILE_UPDATES}${host}.newpkgs >/dev/null 2>&1
-			echo "Done."
+			rm ${DIR_UPD}/${FILE_UPDATES}${HOST}.newpkgs >/dev/null 2>&1
 		fi
 	done
+	echo
 }
 
 # Upgrade remote hosts
 upgrade_machines() {
 	NOW=$(date +%Y-%m-%d)
+	echo "===> Upgrating hosts..."
 	for HOST in $SLACK_HOSTS
 	do
 		if [ -f ${DIR_UPD}/${FILE_UPDATES}${HOST} ]
 		then
-			echo "Upgrating \"$HOST\". "
+			echo "  ---> $HOST"
 			cat ${DIR_UPD}/${FILE_UPDATES}${HOST} | \
 				${RSH_UPGRADE} ${HOST} \
 					"cat - > ${FILE_UPDATES}${HOST}_${NOW}; \
@@ -210,11 +212,12 @@ upgrade_machines() {
 # Send upgrade scripts to hosts
 distribute_up_scripts() {
 	NOW=$(date +%Y-%m-%d)
+	echo "===> Copying upgrade scripts..."
 	for HOST in $SLACK_HOSTS
 	do
 		if [ -f ${DIR_UPD}/${FILE_UPDATES}${HOST} ]
 		then
-			echo "Copying upgrade script to \"$HOST\". "
+			echo "  ---> $HOST"
 			cat ${DIR_UPD}/${FILE_UPDATES}${HOST} | \
 				${RSH_UPGRADE} ${HOST} \
 					"cat - > ${FILE_UPDATES}${HOST}_${NOW}"
@@ -251,7 +254,7 @@ while [ "$1" != "" ]; do
 		--file)
 			HOSTS_FILE="$1"
 			if [ "$HOSTS_FILE" = "" -o ! -f "$HOSTS_FILE" ]; then
-				echo "Error: --file parameter is missing or file not found."
+				echo "*** --file parameter is missing or file not found."
 				echo
 				usage
 				exit 1
@@ -281,17 +284,18 @@ while [ "$1" != "" ]; do
 done
 
 if [ "$SLACK_HOSTS" = "" ]; then
-	echo "Error: No hosts. Check --host parameter, --file parameter ot 'upgrade_hosts' file."
+	echo "*** No hosts. Check --host parameter, --file parameter ot 'upgrade_hosts' file."
 	echo
 	exit 1
 fi
 
-echo -n "==> Hosts: "
+echo -n "---> Hosts: "
 echo $SLACK_HOSTS
 echo
 
 [ "$DO_SYNC"    = "1" ] && (sync_master_list)
 [ "$DO_COLLECT" = "1" ] && (collect_package_lists)
 [ "$DO_GEN"     = "1" ] && (generate_upgrade_scripts)
-[ "$DO_DIST"    = "1" ] && (generate_upgrade_scripts)
+[ "$DO_DIST"    = "1" ] && (distribute_up_scripts)
 [ "$DO_UPGRADE" = "1" ] && (upgrade_machines)
+
