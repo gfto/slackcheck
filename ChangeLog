@@ -1,0 +1,10 @@
+#
+# $Id: ChangeLog,v 1.1 2003/01/05 08:26:12 gf Exp $
+#
+
+ v1.00 - 05 Jan 2003
+   Download package list from slackware mirror
+   Generate "smart" upgrade scripts that download packages
+   Automatic upgrade mode - this allows easy upgrading of many machines at once
+   Manual upgrade mode - just copy upgrade scripts to machines
+
