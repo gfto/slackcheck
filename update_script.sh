@@ -22,6 +22,9 @@
 #  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
+PATH="/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin"
+export PATH
+
 	# *******************
 	#  THE UPDATE SCRIPT
 	# *******************
@@ -143,8 +146,8 @@ mkdir ${REMOTE_DIR} 2>/dev/null
 		# upgrading 'bin' package will cause sed to dissapear
 		# however sed is used by pkgtools so this hack is needed
 		# to allow clear 8.1 -> 9.0 upgrading
-		if [ "`which sed 2>/dev/null`" != "/usr/bin/sed" ]; then
-			pkg_install "Bin upgraded! sed needs to be installed." $PKG_SED
+		if [ ! -x "/usr/bin/sed" ]; then
+			pkg_install "Sed is not installed. Installing it." $PKG_SED
 		fi
 	done
 
