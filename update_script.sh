@@ -30,25 +30,29 @@ if [ "$GENERATED" != "1" ]; then
 	exit
 fi
 
-which wget >/dev/null 2>&1
+which $DL_PRG >/dev/null 2>&1
 if [ $? != 0 ]; then
-	echo "*** Can't find \"wget\" in $PATH. Exiting."
+	echo "*** Can't find \"$DL_PRG\" in $PATH. Exiting."
 	echo
 	exit 1
 fi
 
-which md5sum >/dev/null 2>&1
-if [ $? != 0 ]; then
-	echo "*** Can't find \"md5sum\" MD5 sums will not be checked"
-	echo
-	MD5_CHECK="0"
+if [ "$MD5_CHECK" == "1" ]; then
+	which md5sum >/dev/null 2>&1
+	if [ $? != 0 ]; then
+		echo "*** Can't find \"md5sum\" MD5 sums will not be checked"
+		echo
+		MD5_CHECK="0"
+	fi
 fi
 
-which gpg >/dev/null 2>&1
-if [ $? != 0 ]; then
-	echo "*** Can't find \"gpg\" digital signatures will not be checked"
-	echo
-	SIG_CHECK="0"
+if [ "$SIG_CHECK" == "1" ]; then
+	which gpg >/dev/null 2>&1
+	if [ $? != 0 ]; then
+		echo "*** Can't find \"gpg\" digital signatures will not be checked"
+		echo
+		SIG_CHECK="0"
+	fi
 fi
 
 if [ "$SIG_CHECK" == "1" ]; then
