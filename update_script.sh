@@ -84,6 +84,7 @@ mkdir ${REMOTE_DIR} 2>/dev/null
 	for PKG in $UPDATE; do
 		pkgfile=`basename $PKG`
 		if [ ! -f $pkgfile ]; then
+			echo "   - Downloading $PKG"
 			$DL_PRG $DL_PRG_OPTS ${DL_HOST}/$PKG
 		else
 			echo " -> $pkgfile already exists."
