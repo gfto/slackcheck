@@ -1,7 +1,7 @@
 #!/bin/sh
 # SlackCheck
 #
-# $Id: slcheck.sh,v 1.8 2003/03/07 15:11:00 gf Exp $
+# $Id: slcheck.sh,v 1.9 2003/03/09 22:50:21 gf Exp $
 #
 # Copyright (c) 2002 Georgi Chorbadzhiyski, Sofia, Bulgaria
 # All rights reserved.
@@ -167,6 +167,8 @@ UPDATE=\"\$UPDATE ${pkgdir}/${pkgname}.tgz\" # EXISTING: ${mypack} \
 				 echo
 				 echo "REMOTE_DIR=\"${REMOTE_DIR}\""
 				 echo "REMOTE_DIR_DEL=\"${REMOTE_DIR_DEL}\""
+				 echo
+				 echo "SMART_UPGRADE=\"${SMART_UPGRADE}\""
 				 echo
 				 echo "GENERATED=\"1\""
 				 echo
