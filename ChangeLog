@@ -1,6 +1,9 @@
 #
-# $Id: ChangeLog,v 1.19 2005/01/31 15:45:03 gf Exp $
+# $Id: ChangeLog,v 1.20 2005/12/20 12:28:00 gf Exp $
 #
+
+ v3.50 - 20 December 2005
+   Added possibility to use per host package ignore lists
 
  v3.40 - 31 January 2005
    Fix check for aaa_elflibs package.
