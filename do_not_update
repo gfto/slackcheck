@@ -1,0 +1,47 @@
+# In this file are listed packages that should not be updated
+# by SlackCheck
+#
+# The format is
+#  host:package
+#
+# For example, to forbid updating kernel* and alsa-driver* packages on
+# localhost, the following lines should be used:
+#
+# localhost:kernel
+# localhost:alsa-driver
+#
+# Lines starting with # and empty lines are skipped
+#
+# $Id: do_not_update,v 1.1 2005/12/20 12:26:55 gf Exp $
+#
+
+billdb:kernel-modules
+billing:kernel-modules
+billing:kernel-headers
+cocob:kernel-modules
+cocob:kernel-headers
+cocob:alsa-driver
+db:kernel-modules
+ggenov:kernel-modules
+ggenov:kernel-headers
+ggenov:kernel-source
+ggenov:alsa-driver
+host:kernel-modules
+host:kernel-headers
+man:kernel-modules
+man:kernel-headers
+man:perl
+media:kernel-ide
+media:kernel-modules
+ns:kernel-modules
+plovdiv2:kernel-modules
+routertr:kernel-ide
+routertr:kernel-modules
+routertr:kernel-headers
+slavej:kernel-modules
+slavej:kernel-headers
+slavej:alsa-driver
+vixa:kernel-modules
+vixa:kernel-headers
+vixa:kernel-source
+vixa:alsa-driver
