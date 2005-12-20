@@ -1,7 +1,7 @@
 #!/bin/sh
 # SlackCheck
 #
-# $Id: slcheck.sh,v 1.29 2005/01/31 15:44:16 gf Exp $
+# $Id: slcheck.sh,v 1.30 2005/12/20 12:29:13 gf Exp $
 #
 # Copyright (c) 2002-2004 Georgi Chorbadzhiyski, Sofia, Bulgaria
 # All rights reserved.
@@ -24,7 +24,7 @@
 #  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-echo "SlackCheck v3.40"
+echo "SlackCheck v3.50"
 echo
 
 cd $(dirname $0)
@@ -56,6 +56,8 @@ usage() {
 	echo
 	echo "   --upgrade         Upgrade hosts using generated scripts"
 	echo "   --dist            Only copy upgrade scripts to hosts, do not updgrade"
+	echo
+	echo "   --skip-ignore     Skip checks for ignored packages"
 	echo
 	echo " HOW TO UPGRADE CURRENT HOST"
 	echo "   Run:  $(basename $0) --local --sync --collect --gen --upgrade"
@@ -136,7 +138,7 @@ generate_upgrade_scripts() {
 		# Check if package list exist
 		if [ -f ${DIR_PKG}/${HOST} ]
 		then
-			echo -n "$HOST "
+			echo -n " > $HOST "
 			# Cleanup old files
 			rm ${DIR_UPD}/${FILE_UNKPACKS}${HOST}  >/dev/null 2>&1
 			rm ${DIR_UPD}/${FILE_UPDATES}${HOST}   >/dev/null 2>&1
@@ -152,6 +154,7 @@ generate_upgrade_scripts() {
 					distropkg=$(basename $distro_package) # Strip directory
 					if [ "$distropkg" != "$hostpkg" ]
 					then
+						echo -n .
 						echo "\
 UPDATE=\"\$UPDATE ${distro_package}.tgz\" # EXISTING: ${hostpkg} \
 " >> ${DIR_UPD}/${FILE_UPDATES}${HOST}.newpkgs
@@ -164,12 +167,29 @@ UPDATE=\"\$UPDATE ${distro_package}.tgz\" # EXISTING: ${hostpkg} \
 					echo "$hostpkg" >> ${DIR_UPD}/${FILE_UNKPACKS}${HOST}
 				fi
 			done
-			# Add intereter
-			if [ -f ${DIR_UPD}/${FILE_UPDATES}${HOST}.newpkgs ]
+			echo
+			# Skip ignored packages
+			if [ -s ${DIR_UPD}/${FILE_UPDATES}${HOST}.newpkgs -a \
+			     -f "do_not_update" -a \
+			     "$SKIP_IGNORE" != "1" ]
 			then
-				sort ${DIR_UPD}/${FILE_UPDATES}${HOST}.newpkgs > .newpkgs.tmp
-				cat .newpkgs.tmp > ${DIR_UPD}/${FILE_UPDATES}${HOST}.newpkgs
-				rm .newpkgs.tmp
+				ignore_packs=$(grep ^${HOST}: do_not_update | sed -e 's|^.*:|/|g;s| |\||g' | xargs echo | sed -e 's| |\||g')
+				if [ "$ignore_packs" != "" ]
+				then
+					grep -v -E "${ignore_packs}" ${DIR_UPD}/${FILE_UPDATES}${HOST}.newpkgs > ${DIR_UPD}/.${HOST}.newpkgs.tmp
+					mv ${DIR_UPD}/.${HOST}.newpkgs.tmp ${DIR_UPD}/${FILE_UPDATES}${HOST}.newpkgs
+					if [ ! -s ${DIR_UPD}/${FILE_UPDATES}${HOST}.newpkgs ]
+					then
+						rm ${DIR_UPD}/${FILE_UPDATES}${HOST}.newpkgs
+					fi
+				fi
+			fi
+			# Add intereter
+			if [ -s ${DIR_UPD}/${FILE_UPDATES}${HOST}.newpkgs ]
+			then
+				sort ${DIR_UPD}/${FILE_UPDATES}${HOST}.newpkgs > ${DIR_UPD}/.${HOST}.newpkgs.tmp
+				cat ${DIR_UPD}/.${HOST}.newpkgs.tmp > ${DIR_UPD}/${FILE_UPDATES}${HOST}.newpkgs
+				rm ${DIR_UPD}/.${HOST}.newpkgs.tmp
 				(echo '#!/bin/sh'
 				 echo
 				 echo "DL_HOST=\"${DL_HOST}\""
@@ -323,6 +343,9 @@ while [ "$1" != "" ]; do
 		;;
 		--dist)
 			DO_DIST="1"
+		;;
+		--skip-ignore)
+			SKIP_IGNORE="1"
 		;;
 		--upgrade)
 			DO_UPGRADE="1"
