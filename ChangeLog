@@ -1,10 +1,11 @@
 #
-# $Id: ChangeLog,v 1.21 2006/07/06 15:07:28 gf Exp $
+# $Id: ChangeLog,v 1.22 2006/07/06 23:45:40 gf Exp $
 #
 
  v3.60 - 06 July 2006
-   Update file generation was speeded up by factor of 2
+   Update file generation was speeded up by factor of 3
    Added --verbose option to see what packages will be upgraded
+   A bug was fixed that prevented --gen command from working after --sync
 
  v3.50 - 20 December 2005
    Added possibility to use per host package ignore lists
