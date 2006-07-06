@@ -1,7 +1,7 @@
 #!/bin/sh
 # SlackCheck
 #
-# $Id: slcheck.sh,v 1.32 2006/07/06 15:01:49 gf Exp $
+# $Id: slcheck.sh,v 1.33 2006/07/06 23:42:06 gf Exp $
 #
 # Copyright (c) 2002-2006 Georgi Chorbadzhiyski, Sofia, Bulgaria
 # All rights reserved.
@@ -81,6 +81,7 @@ usage() {
 # Get newest package list
 sync_master_list() {
 	echo "===> Getting newest package list..."
+	WD=$(pwd)
 	mkdir $DIR_PKG 2>/dev/null
 	cd $DIR_PKG
 	TMPDIR=".Tmp"
@@ -98,6 +99,7 @@ sync_master_list() {
 	fi
 	cd ..
 	rm -rf $TMPDIR 2>/dev/null
+	cd $WD
 }
 
 # Generate list of packages for every host
@@ -153,7 +155,7 @@ generate_upgrade_scripts() {
 				distro_package=$(grep /$basepkg-[0-9] ${DIR_PKG}/${FILE_NEWEST})
 				if [ "$distro_package" != "" ]
 				then # Host package exist in the distro packages
-					distropkg=$(basename $distro_package) # Strip directory
+					distropkg="${distro_package##*/}" # Faster basename using build-in BASH tricks
 					if [ "$distropkg" != "$hostpkg" ]
 					then
 						if [ "$VERBOSE" != "1" ]; then
