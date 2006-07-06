@@ -1,7 +1,7 @@
 #!/bin/sh
 # SlackCheck
 #
-# $Id: slcheck.sh,v 1.30 2005/12/20 12:29:13 gf Exp $
+# $Id: slcheck.sh,v 1.31 2006/07/06 14:45:24 gf Exp $
 #
 # Copyright (c) 2002-2004 Georgi Chorbadzhiyski, Sofia, Bulgaria
 # All rights reserved.
@@ -58,6 +58,8 @@ usage() {
 	echo "   --dist            Only copy upgrade scripts to hosts, do not updgrade"
 	echo
 	echo "   --skip-ignore     Skip checks for ignored packages"
+	echo
+	echo "   --verbose         Show more info when update scripts are generated"
 	echo
 	echo " HOW TO UPGRADE CURRENT HOST"
 	echo "   Run:  $(basename $0) --local --sync --collect --gen --upgrade"
@@ -138,7 +140,11 @@ generate_upgrade_scripts() {
 		# Check if package list exist
 		if [ -f ${DIR_PKG}/${HOST} ]
 		then
-			echo -n " > $HOST "
+			if [ "$VERBOSE" != "1" ]; then
+				echo -n " > $HOST "
+			else
+				echo    " > $HOST "
+			fi
 			# Cleanup old files
 			rm ${DIR_UPD}/${FILE_UNKPACKS}${HOST}  >/dev/null 2>&1
 			rm ${DIR_UPD}/${FILE_UPDATES}${HOST}   >/dev/null 2>&1
@@ -154,20 +160,25 @@ generate_upgrade_scripts() {
 					distropkg=$(basename $distro_package) # Strip directory
 					if [ "$distropkg" != "$hostpkg" ]
 					then
-						echo -n .
+						if [ "$VERBOSE" != "1" ]; then
+							echo -n .
+						fi
 						echo "\
 UPDATE=\"\$UPDATE ${distro_package}.tgz\" # EXISTING: ${hostpkg} \
 " >> ${DIR_UPD}/${FILE_UPDATES}${HOST}.newpkgs
-#						echo "New: $hostpkg -> $distropkg"
-#					else
-#						echo "Same: $hostpkg -> $distropkg"
+						if [ "$VERBOSE" == "1" ]; then
+							echo "  NEW: $hostpkg -> $distropkg ($distro_package)"
+						fi
+					else
+						if [ "$VERBOSE" == "1" ]; then
+							echo " SAME: $hostpkg -> $distropkg ($distro_package)"
+						fi
 					fi
-				else # Add to unknown packages
-#					echo "Unknown: $hostpkg"
-					echo "$hostpkg" >> ${DIR_UPD}/${FILE_UNKPACKS}${HOST}
 				fi
 			done
-			echo
+			if [ "$VERBOSE" != "1" ]; then
+				echo
+			fi
 			# Skip ignored packages
 			if [ -s ${DIR_UPD}/${FILE_UPDATES}${HOST}.newpkgs -a \
 			     -f "do_not_update" -a \
@@ -349,6 +360,9 @@ while [ "$1" != "" ]; do
 		;;
 		--upgrade)
 			DO_UPGRADE="1"
+		;;
+		--verbose)
+			VERBOSE="1"
 		;;
 		*)
 			usage
