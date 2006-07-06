@@ -1,9 +1,9 @@
 #!/bin/sh
 # SlackCheck
 #
-# $Id: slcheck.sh,v 1.31 2006/07/06 14:45:24 gf Exp $
+# $Id: slcheck.sh,v 1.32 2006/07/06 15:01:49 gf Exp $
 #
-# Copyright (c) 2002-2004 Georgi Chorbadzhiyski, Sofia, Bulgaria
+# Copyright (c) 2002-2006 Georgi Chorbadzhiyski, Sofia, Bulgaria
 # All rights reserved.
 #
 # Redistribution and use of this script, with or without modification, is
@@ -24,7 +24,7 @@
 #  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-echo "SlackCheck v3.50"
+echo "SlackCheck v3.60"
 echo
 
 cd $(dirname $0)
@@ -121,16 +121,6 @@ collect_package_lists() {
 	done
 }
 
-# Used by generate_upgrade_scripts()
-package_name() {
-	name=$(echo $1 | rev | cut -d- -f4- | rev)
-	if [ "$name" = "" ]; then
-		echo $1
-	else
-		echo $name
-	fi
-}
-
 # Generate upgrade scripts
 generate_upgrade_scripts() {
 	mkdir ${DIR_UPD} 2>/dev/null
@@ -149,12 +139,18 @@ generate_upgrade_scripts() {
 			rm ${DIR_UPD}/${FILE_UNKPACKS}${HOST}  >/dev/null 2>&1
 			rm ${DIR_UPD}/${FILE_UPDATES}${HOST}   >/dev/null 2>&1
 			rm ${DIR_UPD}/${FILE_UPDATES}${HOST}.* >/dev/null 2>&1
-			# For each package, hostpkg is only package name, NO directories!
-			cat ${DIR_PKG}/$HOST | grep -v aaa_elflibs | \
-			while read hostpkg; do
+			# Generate file with package basenames
+			rev < ${DIR_PKG}/$HOST | cut -d- -f4- | rev > ${DIR_UPD}/${FILE_UPDATES}${HOST}.base
+			paste ${DIR_PKG}/$HOST ${DIR_UPD}/${FILE_UPDATES}${HOST}.base | \
+			while read hostpkg basepkg
+			do
+				# aaa_elflibs should not be updated
+				if [ "$basepkg" = "aaa_elflibs" ]; then
+					continue
+				fi
 				# Get package from the distro packages
 				# This contains FULL directory + package name
-				distro_package=$(grep /`package_name $hostpkg`-[0-9] ${DIR_PKG}/${FILE_NEWEST} | head -1 2>/dev/null)
+				distro_package=$(grep /$basepkg-[0-9] ${DIR_PKG}/${FILE_NEWEST})
 				if [ "$distro_package" != "" ]
 				then # Host package exist in the distro packages
 					distropkg=$(basename $distro_package) # Strip directory
@@ -174,6 +170,11 @@ UPDATE=\"\$UPDATE ${distro_package}.tgz\" # EXISTING: ${hostpkg} \
 							echo " SAME: $hostpkg -> $distropkg ($distro_package)"
 						fi
 					fi
+				else # Add to unknown packages
+					if [ "$VERBOSE" == "1" ]; then
+						echo " UNKN: $hostpkg"
+					fi
+					echo "$hostpkg" >> ${DIR_UPD}/${FILE_UNKPACKS}${HOST}
 				fi
 			done
 			if [ "$VERBOSE" != "1" ]; then
@@ -199,8 +200,7 @@ UPDATE=\"\$UPDATE ${distro_package}.tgz\" # EXISTING: ${hostpkg} \
 			if [ -s ${DIR_UPD}/${FILE_UPDATES}${HOST}.newpkgs ]
 			then
 				sort ${DIR_UPD}/${FILE_UPDATES}${HOST}.newpkgs > ${DIR_UPD}/.${HOST}.newpkgs.tmp
-				cat ${DIR_UPD}/.${HOST}.newpkgs.tmp > ${DIR_UPD}/${FILE_UPDATES}${HOST}.newpkgs
-				rm ${DIR_UPD}/.${HOST}.newpkgs.tmp
+				mv ${DIR_UPD}/.${HOST}.newpkgs.tmp ${DIR_UPD}/${FILE_UPDATES}${HOST}.newpkgs
 				(echo '#!/bin/sh'
 				 echo
 				 echo "DL_HOST=\"${DL_HOST}\""
@@ -221,14 +221,14 @@ UPDATE=\"\$UPDATE ${distro_package}.tgz\" # EXISTING: ${hostpkg} \
 				 echo
 				 # Put glibc and elflibs updates first, otherwise
 				 # something may broke
+				 # workarounds
 				 cat ${DIR_UPD}/${FILE_UPDATES}${HOST}.newpkgs | grep a/glibc
 				 cat ${DIR_UPD}/${FILE_UPDATES}${HOST}.newpkgs | grep a/elflibs
 				 cat ${DIR_UPD}/${FILE_UPDATES}${HOST}.newpkgs | grep a/pkgtools
 				 cat ${DIR_UPD}/${FILE_UPDATES}${HOST}.newpkgs | \
-					grep -v a/glibc | \
-					grep -v a/elflibs | \
-					grep -v a/pkgtools
-				 # workarounds
+				    grep -v a/glibc | \
+				    grep -v a/elflibs | \
+				    grep -v a/pkgtools
 				 echo "PKG_SED=\"`grep sed- ${DIR_PKG}/${FILE_NEWEST} 2>/dev/null`\"";
 				 echo "PKG_COREUTILS=\"`grep coreutils- ${DIR_PKG}/${FILE_NEWEST} 2>/dev/null`\"";
 				 echo "PKG_UTEMPTER=\"`grep utempter- ${DIR_PKG}/${FILE_NEWEST} 2>/dev/null`\"";
@@ -240,6 +240,7 @@ UPDATE=\"\$UPDATE ${distro_package}.tgz\" # EXISTING: ${hostpkg} \
 			fi
 			# Cleanup
 			rm ${DIR_UPD}/${FILE_UPDATES}${HOST}.newpkgs >/dev/null 2>&1
+			rm ${DIR_UPD}/${FILE_UPDATES}${HOST}.base >/dev/null 2>&1
 		fi
 	done
 	echo
@@ -251,11 +252,13 @@ upgrade_machines() {
 	echo "===> Upgrating hosts..."
 	for HOST in $SLACK_HOSTS
 	do
+		hname=$(hostname 2>/dev/null)
+		hname_full=$(hostname -f 2>/dev/null)
 		if [ -f ${DIR_UPD}/${FILE_UPDATES}${HOST} ]
 		then
 			# Localhost
-			if [ "$HOST" == "$(hostname)" -o \
-			     "$HOST" == "$(hostname -f)" -o \
+			if [ "$HOST" == "$hname" -o \
+			     "$HOST" == "$hname_full" -o \
 			     "$HOST" == "localhost" ]
 			then
 				echo "  ---> $HOST (Local machine)"
@@ -380,9 +383,9 @@ echo -n "---> Hosts: "
 echo $SLACK_HOSTS
 echo
 
-[ "$DO_SYNC"    = "1" ] && (sync_master_list)
-[ "$DO_COLLECT" = "1" ] && (collect_package_lists)
-[ "$DO_GEN"     = "1" ] && (generate_upgrade_scripts)
-[ "$DO_DIST"    = "1" ] && (distribute_up_scripts)
-[ "$DO_UPGRADE" = "1" ] && (upgrade_machines)
+[ "$DO_SYNC"    = "1" ] && sync_master_list
+[ "$DO_COLLECT" = "1" ] && collect_package_lists
+[ "$DO_GEN"     = "1" ] && generate_upgrade_scripts
+[ "$DO_DIST"    = "1" ] && distribute_up_scripts
+[ "$DO_UPGRADE" = "1" ] && upgrade_machines
 
