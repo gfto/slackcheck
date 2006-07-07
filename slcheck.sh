@@ -1,7 +1,7 @@
 #!/bin/sh
 # SlackCheck
 #
-# $Id: slcheck.sh,v 1.33 2006/07/06 23:42:06 gf Exp $
+# $Id: slcheck.sh,v 1.34 2006/07/07 11:06:05 gf Exp $
 #
 # Copyright (c) 2002-2006 Georgi Chorbadzhiyski, Sofia, Bulgaria
 # All rights reserved.
@@ -129,13 +129,21 @@ generate_upgrade_scripts() {
 	echo "===> Generating upgrade scripts..."
 	for HOST in $SLACK_HOSTS
 	do
+		UPDATED=0
+		SKIPPED=0
+		CURRENT=0
+		UNKNOWN=0
+		TOTAL=0
+		CHECKED=0
+		FILL=$((12 - $(echo $HOST | wc -c)))
+		FL="$(yes "_" | head -$FILL | xargs echo | sed -e 's|_| |g')"
 		# Check if package list exist
 		if [ -f ${DIR_PKG}/${HOST} ]
 		then
 			if [ "$VERBOSE" != "1" ]; then
-				echo -n " > $HOST "
+				echo -n " => $HOST "
 			else
-				echo    " > $HOST "
+				echo    " => $HOST "
 			fi
 			# Cleanup old files
 			rm ${DIR_UPD}/${FILE_UNKPACKS}${HOST}  >/dev/null 2>&1
@@ -143,9 +151,12 @@ generate_upgrade_scripts() {
 			rm ${DIR_UPD}/${FILE_UPDATES}${HOST}.* >/dev/null 2>&1
 			# Generate file with package basenames
 			rev < ${DIR_PKG}/$HOST | cut -d- -f4- | rev > ${DIR_UPD}/${FILE_UPDATES}${HOST}.base
-			paste ${DIR_PKG}/$HOST ${DIR_UPD}/${FILE_UPDATES}${HOST}.base | \
+			paste ${DIR_PKG}/$HOST ${DIR_UPD}/${FILE_UPDATES}${HOST}.base > ${DIR_UPD}/${FILE_UPDATES}${HOST}.paste
+			TOTAL=$(wc -l < ${DIR_UPD}/${FILE_UPDATES}${HOST}.paste)
 			while read hostpkg basepkg
 			do
+				CHECKED=$(($CHECKED + 1))
+
 				# aaa_elflibs should not be updated
 				if [ "$basepkg" = "aaa_elflibs" ]; then
 					continue
@@ -158,30 +169,30 @@ generate_upgrade_scripts() {
 					distropkg="${distro_package##*/}" # Faster basename using build-in BASH tricks
 					if [ "$distropkg" != "$hostpkg" ]
 					then
-						if [ "$VERBOSE" != "1" ]; then
-							echo -n .
-						fi
+						UPDATED=$(($UPDATED + 1))
 						echo "\
 UPDATE=\"\$UPDATE ${distro_package}.tgz\" # EXISTING: ${hostpkg} \
 " >> ${DIR_UPD}/${FILE_UPDATES}${HOST}.newpkgs
 						if [ "$VERBOSE" == "1" ]; then
-							echo "  NEW: $hostpkg -> $distropkg ($distro_package)"
+							echo "  UPD: $hostpkg -> $distropkg ($distro_package)"
 						fi
 					else
+						CURRENT=$(($CURRENT + 1))
 						if [ "$VERBOSE" == "1" ]; then
-							echo " SAME: $hostpkg -> $distropkg ($distro_package)"
+							echo " CURR: $hostpkg -> $distropkg ($distro_package)"
 						fi
 					fi
 				else # Add to unknown packages
+					UNKNOWN=$(($UNKNOWN+1))
 					if [ "$VERBOSE" == "1" ]; then
 						echo " UNKN: $hostpkg"
 					fi
 					echo "$hostpkg" >> ${DIR_UPD}/${FILE_UNKPACKS}${HOST}
 				fi
-			done
-			if [ "$VERBOSE" != "1" ]; then
-				echo
-			fi
+				if [ "$VERBOSE" != "1" ]; then
+					echo -n " => ${HOST}${FL}	Check $CHECKED of $TOTAL"
+				fi
+			done < ${DIR_UPD}/${FILE_UPDATES}${HOST}.paste
 			# Skip ignored packages
 			if [ -s ${DIR_UPD}/${FILE_UPDATES}${HOST}.newpkgs -a \
 			     -f "do_not_update" -a \
@@ -191,6 +202,13 @@ UPDATE=\"\$UPDATE ${distro_package}.tgz\" # EXISTING: ${hostpkg} \
 				if [ "$ignore_packs" != "" ]
 				then
 					grep -v -E "${ignore_packs}" ${DIR_UPD}/${FILE_UPDATES}${HOST}.newpkgs > ${DIR_UPD}/.${HOST}.newpkgs.tmp
+					if [ -f ${DIR_UPD}/.${HOST}.newpkgs.tmp ]
+					then
+						skip1=$(wc -l < ${DIR_UPD}/${FILE_UPDATES}${HOST}.newpkgs)
+						skip2=$(wc -l < ${DIR_UPD}/.${HOST}.newpkgs.tmp)
+						SKIPPED=$(($skip1 - $skip2))
+						UPDATED=$(($UPDATED - $SKIPPED))
+					fi
 					mv ${DIR_UPD}/.${HOST}.newpkgs.tmp ${DIR_UPD}/${FILE_UPDATES}${HOST}.newpkgs
 					if [ ! -s ${DIR_UPD}/${FILE_UPDATES}${HOST}.newpkgs ]
 					then
@@ -198,6 +216,15 @@ UPDATE=\"\$UPDATE ${distro_package}.tgz\" # EXISTING: ${hostpkg} \
 					fi
 				fi
 			fi
+			status="${UPDATED} for update     "
+			if [ "$UPDATED" = "0" ]; then
+					status="Up to date          "
+			fi
+			if [ "$CURRENT" = "0" ]; then
+					status="No host info       "
+			fi
+			echo -n " => ${HOST}${FL}	${status}	/cr ${CURRENT} un ${UNKNOWN} sk ${SKIPPED} up ${UPDATED}/"
+			echo
 			# Add intereter
 			if [ -s ${DIR_UPD}/${FILE_UPDATES}${HOST}.newpkgs ]
 			then
