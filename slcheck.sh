@@ -1,7 +1,7 @@
 #!/bin/sh
 # SlackCheck
 #
-# $Id: slcheck.sh,v 1.34 2006/07/07 11:06:05 gf Exp $
+# $Id: slcheck.sh,v 1.35 2006/07/07 11:46:24 gf Exp $
 #
 # Copyright (c) 2002-2006 Georgi Chorbadzhiyski, Sofia, Bulgaria
 # All rights reserved.
@@ -268,8 +268,7 @@ UPDATE=\"\$UPDATE ${distro_package}.tgz\" # EXISTING: ${hostpkg} \
 				) > ${DIR_UPD}/${FILE_UPDATES}${HOST}
 			fi
 			# Cleanup
-			rm ${DIR_UPD}/${FILE_UPDATES}${HOST}.newpkgs >/dev/null 2>&1
-			rm ${DIR_UPD}/${FILE_UPDATES}${HOST}.base >/dev/null 2>&1
+			rm ${DIR_UPD}/${FILE_UPDATES}${HOST}.* 2>/dev/null
 		fi
 	done
 	echo
@@ -294,17 +293,17 @@ upgrade_machines() {
 				# Use su if we're running not as root
 				if [ "$(id -u)" != "0" ]; then
 					echo "       Enter root password"
-					su -c "/bin/sh ${DIR_UPD}/${FILE_UPDATES}${HOST}"
+					(su -c "/bin/sh ${DIR_UPD}/${FILE_UPDATES}${HOST}") | tee ${DIR_UPD}/log_${FILE_UPDATES}${HOST}
 				else
-					/bin/sh ${DIR_UPD}/${FILE_UPDATES}${HOST}
+					(/bin/sh ${DIR_UPD}/${FILE_UPDATES}${HOST}) | tee ${DIR_UPD}/log_${FILE_UPDATES}${HOST}
 				fi
 			# Remote host
 			else
 				echo "  ---> $HOST"
-				cat ${DIR_UPD}/${FILE_UPDATES}${HOST} | \
+				(cat ${DIR_UPD}/${FILE_UPDATES}${HOST} | \
 					${RSH_UPGRADE} ${HOST} \
 						"cat - > ${FILE_UPDATES}${HOST}_${NOW}; \
-						/bin/sh ${FILE_UPDATES}${HOST}_${NOW};"
+						/bin/sh ${FILE_UPDATES}${HOST}_${NOW};") | tee ${DIR_UPD}/log_${FILE_UPDATES}${HOST}
 			fi
 		fi
 	done
