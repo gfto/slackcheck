@@ -1,7 +1,7 @@
 #!/bin/sh
 # SlackCheck
 #
-# $Id: slcheck.sh,v 1.36 2006/07/10 08:30:58 gf Exp $
+# $Id: slcheck.sh,v 1.37 2006/07/10 08:37:05 gf Exp $
 #
 # Copyright (c) 2002-2006 Georgi Chorbadzhiyski, Sofia, Bulgaria
 # All rights reserved.
@@ -147,6 +147,10 @@ generate_upgrade_scripts() {
 		TOTAL=0
 		CHECKED=0
 		FILL=$((12 - $(echo $HOST | wc -c)))
+		if [ $FILL -le 0 ]
+		then
+			FILL=4
+		fi
 		FL="$(yes "_" | head -$FILL | xargs echo | sed -e 's|_| |g')"
 		# Check if package list exist
 		if [ -f ${DIR_PKG}/${HOST} ]
