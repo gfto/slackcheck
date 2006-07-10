@@ -1,7 +1,7 @@
 #!/bin/sh
 # SlackCheck
 #
-# $Id: slcheck.sh,v 1.37 2006/07/10 08:37:05 gf Exp $
+# $Id: slcheck.sh,v 1.38 2006/07/10 08:55:09 gf Exp $
 #
 # Copyright (c) 2002-2006 Georgi Chorbadzhiyski, Sofia, Bulgaria
 # All rights reserved.
@@ -146,12 +146,12 @@ generate_upgrade_scripts() {
 		UNKNOWN=0
 		TOTAL=0
 		CHECKED=0
-		FILL=$((12 - $(echo $HOST | wc -c)))
+		FILL=$((28 - $(echo $HOST | wc -c)))
 		if [ $FILL -le 0 ]
 		then
 			FILL=4
 		fi
-		FL="$(yes "_" | head -$FILL | xargs echo | sed -e 's|_| |g')"
+		FL="$(yes "_" | head -$FILL | xargs echo | sed -e 's| ||g;s|_| |g')"
 		# Check if package list exist
 		if [ -f ${DIR_PKG}/${HOST} ]
 		then
@@ -231,14 +231,14 @@ UPDATE=\"\$UPDATE ${distro_package}.tgz\" # EXISTING: ${hostpkg} \
 					fi
 				fi
 			fi
-			status="${UPDATED} for update     "
+			status="${UPDATED} for update "
 			if [ "$UPDATED" = "0" ]; then
-					status="Up to date          "
+					status="Up to date   "
 			fi
 			if [ "$CURRENT" = "0" ]; then
-					status="No host info       "
+					status="No host info "
 			fi
-			echo -n " => ${HOST}${FL}	${status}	/cur ${CURRENT} unk ${UNKNOWN} skip ${SKIPPED} upd ${UPDATED}/"
+			echo -n " => ${HOST}${FL}	${status}/cr ${CURRENT} un ${UNKNOWN} sk ${SKIPPED} new ${UPDATED}/"
 			echo
 			# Add intereter
 			if [ -s ${DIR_UPD}/${FILE_UPDATES}${HOST}.newpkgs ]
