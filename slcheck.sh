@@ -1,7 +1,7 @@
 #!/bin/sh
 # SlackCheck
 #
-# $Id: slcheck.sh,v 1.35 2006/07/07 11:46:24 gf Exp $
+# $Id: slcheck.sh,v 1.36 2006/07/10 08:30:58 gf Exp $
 #
 # Copyright (c) 2002-2006 Georgi Chorbadzhiyski, Sofia, Bulgaria
 # All rights reserved.
@@ -24,7 +24,7 @@
 #  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-echo "SlackCheck v3.60"
+echo "SlackCheck v3.70"
 echo
 
 cd $(dirname $0)
@@ -97,6 +97,8 @@ sync_master_list() {
 	then
 		grep .tgz$ CHECKSUMS.md5 | cut -d" " -f3 | sed -e 's|.tgz||;s|\./||' >> ../${FILE_NEWEST}
 	fi
+	rev < ../${FILE_NEWEST} | cut -d- -f4- | rev | sed -e 's|.*/||;s|[^A-Za-z0-9_]|_|g' > ../.${FILE_NEWEST}.base
+	paste ../.${FILE_NEWEST}.base ../${FILE_NEWEST} > ../.${FILE_NEWEST}.paste
 	cd ..
 	rm -rf $TMPDIR 2>/dev/null
 	cd $WD
@@ -125,8 +127,17 @@ collect_package_lists() {
 
 # Generate upgrade scripts
 generate_upgrade_scripts() {
-	mkdir ${DIR_UPD} 2>/dev/null
+	[ -d ${DIR_UPD} ] || mkdir ${DIR_UPD}
 	echo "===> Generating upgrade scripts..."
+	if [ ! -f ${DIR_PKG}/.${FILE_NEWEST}.paste ]
+	then
+		sync_master_list
+	fi
+	# Init \$basepkg variables
+	while read basepkg hostpkg
+	do
+		eval $basepkg=$hostpkg
+	done < ${DIR_PKG}/.${FILE_NEWEST}.paste
 	for HOST in $SLACK_HOSTS
 	do
 		UPDATED=0
@@ -150,7 +161,7 @@ generate_upgrade_scripts() {
 			rm ${DIR_UPD}/${FILE_UPDATES}${HOST}   >/dev/null 2>&1
 			rm ${DIR_UPD}/${FILE_UPDATES}${HOST}.* >/dev/null 2>&1
 			# Generate file with package basenames
-			rev < ${DIR_PKG}/$HOST | cut -d- -f4- | rev > ${DIR_UPD}/${FILE_UPDATES}${HOST}.base
+			rev < ${DIR_PKG}/$HOST | cut -d- -f4- | rev  | sed -e 's|.*/||;s|[^A-Za-z0-9_]|_|g' > ${DIR_UPD}/${FILE_UPDATES}${HOST}.base
 			paste ${DIR_PKG}/$HOST ${DIR_UPD}/${FILE_UPDATES}${HOST}.base > ${DIR_UPD}/${FILE_UPDATES}${HOST}.paste
 			TOTAL=$(wc -l < ${DIR_UPD}/${FILE_UPDATES}${HOST}.paste)
 			while read hostpkg basepkg
@@ -163,8 +174,8 @@ generate_upgrade_scripts() {
 				fi
 				# Get package from the distro packages
 				# This contains FULL directory + package name
-				distro_package=$(grep /$basepkg-[0-9] ${DIR_PKG}/${FILE_NEWEST})
-				if [ "$distro_package" != "" ]
+				eval distro_package="\$$basepkg"
+				if [ "$distro_package" != "" -a "$distro_package" != "\$" ]
 				then # Host package exist in the distro packages
 					distropkg="${distro_package##*/}" # Faster basename using build-in BASH tricks
 					if [ "$distropkg" != "$hostpkg" ]
@@ -223,7 +234,7 @@ UPDATE=\"\$UPDATE ${distro_package}.tgz\" # EXISTING: ${hostpkg} \
 			if [ "$CURRENT" = "0" ]; then
 					status="No host info       "
 			fi
-			echo -n " => ${HOST}${FL}	${status}	/cr ${CURRENT} un ${UNKNOWN} sk ${SKIPPED} up ${UPDATED}/"
+			echo -n " => ${HOST}${FL}	${status}	/cur ${CURRENT} unk ${UNKNOWN} skip ${SKIPPED} upd ${UPDATED}/"
 			echo
 			# Add intereter
 			if [ -s ${DIR_UPD}/${FILE_UPDATES}${HOST}.newpkgs ]
@@ -293,9 +304,9 @@ upgrade_machines() {
 				# Use su if we're running not as root
 				if [ "$(id -u)" != "0" ]; then
 					echo "       Enter root password"
-					(su -c "/bin/sh ${DIR_UPD}/${FILE_UPDATES}${HOST}") | tee ${DIR_UPD}/log_${FILE_UPDATES}${HOST}
+					(su -c "/bin/sh ${DIR_UPD}/${FILE_UPDATES}${HOST}") 2>&1 | tee ${DIR_UPD}/log_${FILE_UPDATES}${HOST}
 				else
-					(/bin/sh ${DIR_UPD}/${FILE_UPDATES}${HOST}) | tee ${DIR_UPD}/log_${FILE_UPDATES}${HOST}
+					(/bin/sh ${DIR_UPD}/${FILE_UPDATES}${HOST}) 2>&1 | tee ${DIR_UPD}/log_${FILE_UPDATES}${HOST}
 				fi
 			# Remote host
 			else
@@ -303,7 +314,7 @@ upgrade_machines() {
 				(cat ${DIR_UPD}/${FILE_UPDATES}${HOST} | \
 					${RSH_UPGRADE} ${HOST} \
 						"cat - > ${FILE_UPDATES}${HOST}_${NOW}; \
-						/bin/sh ${FILE_UPDATES}${HOST}_${NOW};") | tee ${DIR_UPD}/log_${FILE_UPDATES}${HOST}
+						/bin/sh ${FILE_UPDATES}${HOST}_${NOW};") 2>&1 | tee ${DIR_UPD}/log_${FILE_UPDATES}${HOST}
 			fi
 		fi
 	done
