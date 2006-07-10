@@ -1,10 +1,11 @@
 #
-# $Id: ChangeLog,v 1.24 2006/07/10 08:29:43 gf Exp $
+# $Id: ChangeLog,v 1.25 2006/07/10 08:39:06 gf Exp $
 #
 
  v3.70 - 10 July 2006
    Update file generation is further sped up
    Added progress indicator and host status after update file generation
+   Added log file for each host updates
 
  v3.60 - 06 July 2006
    Update file generation was sped up by factor of 3
