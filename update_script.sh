@@ -75,7 +75,7 @@ pkg_install() {
 	MSG="$1"
 	PKG="$2"
 	echo $MSG
-	$DL_PRG $DL_PRG_OPTS ${DL_HOST}/$PKG.tgz
+	$DL_PRG $DL_PRG_OPTS ${DL_HOST}/$PKG
 	installpkg `basename $PKG`
 }
 
@@ -84,7 +84,7 @@ pkg_upgrade() {
 	PKG="$2"
 	OLD="$3"
 	echo $MSG
-	$DL_PRG $DL_PRG_OPTS ${DL_HOST}/$PKG.tgz
+	$DL_PRG $DL_PRG_OPTS ${DL_HOST}/$PKG
 	upgradepkg ${OLD}%`basename $PKG`
 }
 
@@ -140,7 +140,7 @@ mkdir ${REMOTE_DIR} 2>/dev/null
 
 	echo "===> Upgrating packages..."
 	for PKG in $UPDATE; do
-		pkgfile=`basename $PKG`
+		pkgfile=`basename $PKG | sed -e 's|\.t[a-z]z$||'`
 		upgradepkg ${pkgfile}
 		# UGLY HACK! sed was split from 'bin' package and
 		# upgrading 'bin' package will cause sed to dissapear
