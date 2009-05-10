@@ -1,7 +1,7 @@
 #!/bin/sh
 # SlackCheck
 #
-# $Id: slcheck.sh,v 1.38 2006/07/10 08:55:09 gf Exp $
+# $Id: slcheck.sh,v 1.39 2009/05/10 12:47:43 gf Exp $
 #
 # Copyright (c) 2002-2006 Georgi Chorbadzhiyski, Sofia, Bulgaria
 # All rights reserved.
@@ -91,14 +91,14 @@ sync_master_list() {
 	${DL_PRG} ${DL_PRG_OPTS} ${DL_HOST}/CHECKSUMS.md5
 
 	# Parse file
-	grep .tgz$ CHECKSUMS.md5 | grep patches | cut -d" " -f3 | sed -e 's|.tgz||;s|\./||' > ../${FILE_NEWEST}
-	grep .tgz$ CHECKSUMS.md5 | grep slackware | cut -d" " -f3 | sed -e 's|.tgz||;s|\./||' >> ../${FILE_NEWEST}
+	grep -E "\.t[a-z]z$" CHECKSUMS.md5 | grep patches | cut -d" " -f3 | sed -e 's|\./||' > ../${FILE_NEWEST}
+	grep -E "\.t[a-z]z$" CHECKSUMS.md5 | grep slackware | cut -d" " -f3 | sed -e 's|\./||' >> ../${FILE_NEWEST}
 	if [ $(LANG=C ls -l ../${FILE_NEWEST} | tr -s ' ' | cut -d" " -f 5) = "0" ]
 	then
-		grep .tgz$ CHECKSUMS.md5 | cut -d" " -f3 | sed -e 's|.tgz||;s|\./||' >> ../${FILE_NEWEST}
+		grep -E "\.t[a-z]z$" CHECKSUMS.md5 | cut -d" " -f3 | sed -e 's|\./||' >> ../${FILE_NEWEST}
 	fi
 	rev < ../${FILE_NEWEST} | cut -d- -f4- | rev | sed -e 's|.*/||;s|[^A-Za-z0-9_]|_|g' > ../.${FILE_NEWEST}.base
-	paste ../.${FILE_NEWEST}.base ../${FILE_NEWEST} > ../.${FILE_NEWEST}.paste
+	paste ../.${FILE_NEWEST}.base ../${FILE_NEWEST} | sed -e 's|\.\(t[a-z]z\)|	\1|' > ../.${FILE_NEWEST}.paste
 	cd ..
 	rm -rf $TMPDIR 2>/dev/null
 	cd $WD
@@ -134,9 +134,10 @@ generate_upgrade_scripts() {
 		sync_master_list
 	fi
 	# Init \$basepkg variables
-	while read basepkg hostpkg
+	while read basepkg hostpkg ext
 	do
 		eval $basepkg=$hostpkg
+		eval E_$basepkg=$hostpkg.$ext
 	done < ${DIR_PKG}/.${FILE_NEWEST}.paste
 	for HOST in $SLACK_HOSTS
 	do
@@ -179,6 +180,7 @@ generate_upgrade_scripts() {
 				# Get package from the distro packages
 				# This contains FULL directory + package name
 				eval distro_package="\$$basepkg"
+				eval distro_package_ext="\$E_$basepkg"
 				if [ "$distro_package" != "" -a "$distro_package" != "\$" ]
 				then # Host package exist in the distro packages
 					distropkg="${distro_package##*/}" # Faster basename using build-in BASH tricks
@@ -186,15 +188,15 @@ generate_upgrade_scripts() {
 					then
 						UPDATED=$(($UPDATED + 1))
 						echo "\
-UPDATE=\"\$UPDATE ${distro_package}.tgz\" # EXISTING: ${hostpkg} \
+UPDATE=\"\$UPDATE ${distro_package_ext}\" # EXISTING: ${hostpkg} \
 " >> ${DIR_UPD}/${FILE_UPDATES}${HOST}.newpkgs
 						if [ "$VERBOSE" == "1" ]; then
-							echo "  UPD: $hostpkg -> $distropkg ($distro_package)"
+							echo "  UPD: $hostpkg -> $distropkg ($distro_package_ext)"
 						fi
 					else
 						CURRENT=$(($CURRENT + 1))
 						if [ "$VERBOSE" == "1" ]; then
-							echo " CURR: $hostpkg -> $distropkg ($distro_package)"
+							echo " CURR: $hostpkg -> $distropkg ($distro_package_ext)"
 						fi
 					fi
 				else # Add to unknown packages
