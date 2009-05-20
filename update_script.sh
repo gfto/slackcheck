@@ -153,7 +153,7 @@ mkdir ${REMOTE_DIR} 2>/dev/null
 		if [ ! -x "/usr/bin/sed" ]; then
 			pkg_install "Sed is not installed. Installing it." $PKG_SED
 		fi
-		if [ "$PKG_LIBCAP" != "" -a ! -f "lib/libcap.a" ]; then
+		if [ "$PKG_LIBCAP" != "" -a ! -f "/lib/libcap.a" ]; then
 			pkg_install "libcap is not installed. Installing it." $PKG_LIBCAP
 		fi
 	done
