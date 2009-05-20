@@ -1,38 +1,15 @@
-# In this file are listed hosts that'll upgraded by SlackCheck
-# Put one host per line
-# Lines starting with # and empty lines are skipped
-#
-# $Id: update_hosts,v 1.5 2004/08/03 13:32:02 gf Exp $
-#
-
-atilla
-billdb
-billing
-cable-gf
-db
-dvl00
-flirt4e
 gf
-ggenov
-host
-man
-noname
 ns
-pbx
-peter
-router
-rumi
-sato
-sc
-slavej
-sounder
-starlight
-stoill
-support1
-#support2
 work
-#ns.top.bg
-#irc.top.bg
-#matrix.top.bg
-#user.top.bg
-#www.top.bg
+baseiptv
+router
+host
+noname
+man
+live
+iptv
+snaps
+starlight
+onetv2
+twotv2
+virt1

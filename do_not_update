@@ -12,36 +12,13 @@
 #
 # Lines starting with # and empty lines are skipped
 #
-# $Id: do_not_update,v 1.1 2005/12/20 12:26:55 gf Exp $
+# $Id: do_not_update,v 1.2 2009/05/20 08:49:58 gf Exp $
 #
 
-billdb:kernel-modules
-billing:kernel-modules
-billing:kernel-headers
-cocob:kernel-modules
-cocob:kernel-headers
-cocob:alsa-driver
-db:kernel-modules
-ggenov:kernel-modules
-ggenov:kernel-headers
-ggenov:kernel-source
-ggenov:alsa-driver
-host:kernel-modules
-host:kernel-headers
-man:kernel-modules
-man:kernel-headers
 man:perl
-media:kernel-ide
-media:kernel-modules
-ns:kernel-modules
-plovdiv2:kernel-modules
-routertr:kernel-ide
-routertr:kernel-modules
-routertr:kernel-headers
-slavej:kernel-modules
-slavej:kernel-headers
-slavej:alsa-driver
-vixa:kernel-modules
-vixa:kernel-headers
-vixa:kernel-source
-vixa:alsa-driver
+iptv:perl
+iptv:kernel
+ns:kernel
+man:kernel
+twotv2:ruby
+onetv2:ruby
