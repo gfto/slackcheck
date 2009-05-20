@@ -1,7 +1,7 @@
 #!/bin/sh
 # SlackCheck
 #
-# $Id: slcheck.sh,v 1.39 2009/05/10 12:47:43 gf Exp $
+# $Id: slcheck.sh,v 1.40 2009/05/20 08:48:04 gf Exp $
 #
 # Copyright (c) 2002-2006 Georgi Chorbadzhiyski, Sofia, Bulgaria
 # All rights reserved.
@@ -265,16 +265,13 @@ UPDATE=\"\$UPDATE ${distro_package_ext}\" # EXISTING: ${hostpkg} \
 				 echo
 				 echo "# If you don't want package to be updated just delete the line."
 				 echo
-				 # Put glibc and elflibs updates first, otherwise
-				 # something may broke
-				 # workarounds
+				 # pkgtools and tar must be first
+				 # glibc and elflibs next
+				 cat ${DIR_UPD}/${FILE_UPDATES}${HOST}.newpkgs | grep a/pkgtools
+				 cat ${DIR_UPD}/${FILE_UPDATES}${HOST}.newpkgs | grep a/tar
 				 cat ${DIR_UPD}/${FILE_UPDATES}${HOST}.newpkgs | grep a/glibc
 				 cat ${DIR_UPD}/${FILE_UPDATES}${HOST}.newpkgs | grep a/elflibs
-				 cat ${DIR_UPD}/${FILE_UPDATES}${HOST}.newpkgs | grep a/pkgtools
-				 cat ${DIR_UPD}/${FILE_UPDATES}${HOST}.newpkgs | \
-				    grep -v a/glibc | \
-				    grep -v a/elflibs | \
-				    grep -v a/pkgtools
+				 cat ${DIR_UPD}/${FILE_UPDATES}${HOST}.newpkgs | grep -v -E "a/(pkgtools|tar|glibc|elflibs)"
 				 echo "PKG_SED=\"`grep sed- ${DIR_PKG}/${FILE_NEWEST} 2>/dev/null`\"";
 				 echo "PKG_COREUTILS=\"`grep coreutils- ${DIR_PKG}/${FILE_NEWEST} 2>/dev/null`\"";
 				 echo "PKG_UTEMPTER=\"`grep utempter- ${DIR_PKG}/${FILE_NEWEST} 2>/dev/null`\"";
