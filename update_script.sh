@@ -144,6 +144,9 @@ mkdir ${REMOTE_DIR} 2>/dev/null
 	if [ "$PKG_XZ" != "" -a ! -x "/bin/xz" ]; then
 		pkg_install "xz is not installed. Installing it." $PKG_XZ
 	fi
+	if [ "$PKG_LIBCAP" != "" -a ! -f "lib/libcap.a" ]; then
+		pkg_install "libcap is not installed. Installing it." $PKG_LIBCAP
+	fi
 	for PKG in $UPDATE; do
 		pkgfile=`basename $PKG | sed -e 's|\.t[a-z]z$||'`
 		upgradepkg ${pkgfile}.t?z

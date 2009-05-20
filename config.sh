@@ -1,7 +1,7 @@
 #!/bin/sh
 # SlackCheck configuration file
 #
-# $Id: config.sh,v 1.9 2005/01/28 12:47:05 gf Exp $
+# $Id: config.sh,v 1.10 2009/05/20 10:55:22 gf Exp $
 #
 
 PATH="/bin:/usr/bin:/usr/local/bin"
@@ -35,7 +35,7 @@ REMOTE_DIR="Updates"      # Upgraded packages will be downloaded in this
                           # Make sure it has enough disk space!
                           # After generating upgrade scripts you can change
                           # this variable per host
-REMOTE_DIR_DEL="1"        # Delete directory with downloaded packages after
+REMOTE_DIR_DEL="0"        # Delete directory with downloaded packages after
                           # finishing updates
 
 SMART_UPGRADE="1"         # When lilo-* or kernel-* packages are updated run
