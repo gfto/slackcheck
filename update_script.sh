@@ -140,8 +140,13 @@ mkdir ${REMOTE_DIR} 2>/dev/null
 
 	echo "===> Upgrating packages..."
 	for PKG in $UPDATE; do
+		# UGLY HACK #2, to upgrade from 12.1 to -current you need
+		# libxz because of lzma compression of newer packages
+		if [ "$PKG_XZ" != "" -a ! -x "/bin/xz" ]; then
+			pkg_install "xz is not installed. Installing it." $PKG_XZ
+		fi
 		pkgfile=`basename $PKG | sed -e 's|\.t[a-z]z$||'`
-		upgradepkg ${pkgfile}
+		upgradepkg ${pkgfile}.t?z
 		# UGLY HACK! sed was split from 'bin' package and
 		# upgrading 'bin' package will cause sed to dissapear
 		# however sed is used by pkgtools so this hack is needed
