@@ -1,7 +1,7 @@
 #!/bin/sh
 # SlackCheck
 #
-# $Id: slcheck.sh,v 1.41 2009/05/20 08:50:30 gf Exp $
+# $Id: slcheck.sh,v 1.42 2009/05/20 09:15:26 gf Exp $
 #
 # Copyright (c) 2002-2006 Georgi Chorbadzhiyski, Sofia, Bulgaria
 # All rights reserved.
@@ -272,6 +272,7 @@ UPDATE=\"\$UPDATE ${distro_package_ext}\" # EXISTING: ${hostpkg} \
 				 cat ${DIR_UPD}/${FILE_UPDATES}${HOST}.newpkgs | grep a/glibc
 				 cat ${DIR_UPD}/${FILE_UPDATES}${HOST}.newpkgs | grep a/elflibs
 				 cat ${DIR_UPD}/${FILE_UPDATES}${HOST}.newpkgs | grep -v -E "a/(pkgtools|tar|glibc|elflibs)"
+				 echo "PKG_XZ=\"`grep xz- ${DIR_PKG}/${FILE_NEWEST} 2>/dev/null`\"";
 				 echo "PKG_SED=\"`grep sed- ${DIR_PKG}/${FILE_NEWEST} 2>/dev/null`\"";
 				 echo "PKG_COREUTILS=\"`grep coreutils- ${DIR_PKG}/${FILE_NEWEST} 2>/dev/null`\"";
 				 echo "PKG_UTEMPTER=\"`grep utempter- ${DIR_PKG}/${FILE_NEWEST} 2>/dev/null`\"";
