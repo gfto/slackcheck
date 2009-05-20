@@ -144,18 +144,17 @@ mkdir ${REMOTE_DIR} 2>/dev/null
 	if [ "$PKG_XZ" != "" -a ! -x "/bin/xz" ]; then
 		pkg_install "xz is not installed. Installing it." $PKG_XZ
 	fi
-	if [ "$PKG_LIBCAP" != "" -a ! -f "lib/libcap.a" ]; then
-		pkg_install "libcap is not installed. Installing it." $PKG_LIBCAP
-	fi
 	for PKG in $UPDATE; do
-		pkgfile=`basename $PKG | sed -e 's|\.t[a-z]z$||'`
-		upgradepkg ${pkgfile}.t?z
+		upgradepkg `basename $PKG`
 		# UGLY HACK! sed was split from 'bin' package and
 		# upgrading 'bin' package will cause sed to dissapear
 		# however sed is used by pkgtools so this hack is needed
 		# to allow clear 8.1 -> 9.0 upgrading
 		if [ ! -x "/usr/bin/sed" ]; then
 			pkg_install "Sed is not installed. Installing it." $PKG_SED
+		fi
+		if [ "$PKG_LIBCAP" != "" -a ! -f "lib/libcap.a" ]; then
+			pkg_install "libcap is not installed. Installing it." $PKG_LIBCAP
 		fi
 	done
 
