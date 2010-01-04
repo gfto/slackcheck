@@ -1,6 +1,9 @@
 #
-# $Id: ChangeLog,v 1.26 2009/05/20 09:19:43 gf Exp $
+# $Id: ChangeLog,v 1.27 2010/01/04 07:39:50 gf Exp $
 #
+
+ v3.90 - 04 January 2010
+   Fixed libcap check to work on Slackware64
 
  v3.80 - 20 May 2009
    Updated to allow upgrade with newer (LZMA) package compression
