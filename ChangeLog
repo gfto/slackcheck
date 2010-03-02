@@ -1,6 +1,9 @@
 #
-# $Id: ChangeLog,v 1.27 2010/01/04 07:39:50 gf Exp $
+# $Id: ChangeLog,v 1.28 2010/03/02 12:30:04 gf Exp $
 #
+
+ v3.91 - 02 March 2010
+   Added workaround for gmp dependency in coreutils-8.4
 
  v3.90 - 04 January 2010
    Fixed libcap check to work on Slackware64
