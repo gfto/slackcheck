@@ -1,7 +1,7 @@
 #!/bin/sh
 # SlackCheck
 #
-# $Id: slcheck.sh,v 1.44 2010/01/04 07:39:40 gf Exp $
+# $Id: slcheck.sh,v 1.45 2010/03/02 12:28:54 gf Exp $
 #
 # Copyright (c) 2002-2006 Georgi Chorbadzhiyski, Sofia, Bulgaria
 # All rights reserved.
@@ -24,7 +24,7 @@
 #  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-echo "SlackCheck v3.90"
+echo "SlackCheck v3.91"
 echo
 
 cd $(dirname $0)
@@ -188,7 +188,7 @@ generate_upgrade_scripts() {
 					then
 						UPDATED=$(($UPDATED + 1))
 						echo "\
-UPDATE=\"\$UPDATE ${distro_package_ext}\" # EXISTING: ${hostpkg} \
+UPDATE=\"\$UPDATE ${distro_package_ext}\" # EXISTING: ${hostpkg}\
 " >> ${DIR_UPD}/${FILE_UPDATES}${HOST}.newpkgs
 						if [ "$VERBOSE" == "1" ]; then
 							echo "  UPD: $hostpkg -> $distropkg ($distro_package_ext)"
@@ -272,6 +272,7 @@ UPDATE=\"\$UPDATE ${distro_package_ext}\" # EXISTING: ${hostpkg} \
 				 cat ${DIR_UPD}/${FILE_UPDATES}${HOST}.newpkgs | grep a/glibc
 				 cat ${DIR_UPD}/${FILE_UPDATES}${HOST}.newpkgs | grep a/elflibs
 				 cat ${DIR_UPD}/${FILE_UPDATES}${HOST}.newpkgs | grep -v -E "a/(pkgtools|tar|glibc|elflibs)"
+				 echo "PKG_GMP=\"`grep gmp- ${DIR_PKG}/${FILE_NEWEST} 2>/dev/null`\"";
 				 echo "PKG_LIBCAP=\"`grep libcap- ${DIR_PKG}/${FILE_NEWEST} 2>/dev/null`\"";
 				 echo "PKG_XZ=\"`grep xz- ${DIR_PKG}/${FILE_NEWEST} 2>/dev/null`\"";
 				 echo "PKG_SED=\"`grep sed- ${DIR_PKG}/${FILE_NEWEST} 2>/dev/null`\"";

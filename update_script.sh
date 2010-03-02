@@ -144,6 +144,11 @@ mkdir ${REMOTE_DIR} 2>/dev/null
 	if [ "$PKG_XZ" != "" -a ! -x "/bin/xz" ]; then
 		pkg_install "xz is not installed. Installing it." $PKG_XZ
 	fi
+	# UGLY HACK #3, to upgrade from 13.0 to -current you need
+	# coreutils-8.4 has new dependency for the expr program
+	if [ "$PKG_GMP" != "" -a ! -f "/usr/lib/libgmp.la" ]; then
+		pkg_install "gmp is not installed. Installing it." $PKG_GMP
+	fi
 	for PKG in $UPDATE; do
 		upgradepkg `basename $PKG`
 		# UGLY HACK! sed was split from 'bin' package and
