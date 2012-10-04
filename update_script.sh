@@ -149,6 +149,11 @@ mkdir ${REMOTE_DIR} 2>/dev/null
 	if [ "$PKG_GMP" != "" -a ! -f "/usr/lib/libgmp.la" ]; then
 		pkg_install "gmp is not installed. Installing it." $PKG_GMP
 	fi
+	# UGLY HACK #4, to upgrade from 13.1 to 14 you need
+	# kmod otherwise would get unbootable machine
+	if [ "$PKG_KMOD" != "" -a \( ! -f "/lib/libkmod.so.2" -a ! -f "/lib64/libkmod.so.2" \) ]; then
+		pkg_install "kmod is not installed. Installing it." $PKG_KMOD
+	fi
 	for PKG in $UPDATE; do
 		upgradepkg `basename $PKG`
 		# UGLY HACK! sed was split from 'bin' package and

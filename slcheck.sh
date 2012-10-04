@@ -267,6 +267,7 @@ UPDATE=\"\$UPDATE ${distro_package_ext}\" # EXISTING: ${hostpkg}\
 				 cat ${DIR_UPD}/${FILE_UPDATES}${HOST}.newpkgs | grep a/glibc
 				 cat ${DIR_UPD}/${FILE_UPDATES}${HOST}.newpkgs | grep a/elflibs
 				 cat ${DIR_UPD}/${FILE_UPDATES}${HOST}.newpkgs | grep -v -E "a/(pkgtools|tar|glibc|elflibs)"
+				 echo "PKG_KMOD=\"`grep kmod- ${DIR_PKG}/${FILE_NEWEST} 2>/dev/null`\"";
 				 echo "PKG_GMP=\"`grep gmp- ${DIR_PKG}/${FILE_NEWEST} 2>/dev/null`\"";
 				 echo "PKG_LIBCAP=\"`grep libcap- ${DIR_PKG}/${FILE_NEWEST} 2>/dev/null`\"";
 				 echo "PKG_XZ=\"`grep xz- ${DIR_PKG}/${FILE_NEWEST} 2>/dev/null`\"";
