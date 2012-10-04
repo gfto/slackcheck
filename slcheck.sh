@@ -172,11 +172,6 @@ generate_upgrade_scripts() {
 			while read hostpkg basepkg
 			do
 				CHECKED=$(($CHECKED + 1))
-
-				# aaa_elflibs should not be updated
-				if [ "$basepkg" = "aaa_elflibs" ]; then
-					continue
-				fi
 				# Get package from the distro packages
 				# This contains FULL directory + package name
 				eval distro_package="\$$basepkg"
